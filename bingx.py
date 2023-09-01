@@ -10,14 +10,14 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 import ta
 from tqdm import tqdm
+import os
 
 APIURL = "https://open-api.bingx.com";
-APIKEY = ""
-SECRETKEY = ""
 defaultCurrenCyParamsMap = {
     "symbol": "BTC-USDT",
     "interval": "1d",
     # "startTime": str(int((datetime.now() - timedelta(days=1)).)),
+    # "startTime": f"{0}",
     # "startTime": 5,
     # "startTime": 0,
     # "endTime": 0,
@@ -107,7 +107,7 @@ def strongBerishCandle(row):
     return (row['Close'] >= row['Low'] * 0.99) and (row['Close'] < row['Open'])
 ###################################################################################################################
 
-dfAllCurrencies = pd.json_normalize(json.loads(getAllCurrencies())['data']['symbols'])
+# dfAllCurrencies = pd.json_normalize(json.loads(getAllCurrencies())['data']['symbols'])
 
 def getCurrencyDataFrame(currencyParams):
     dfCurrency = pd.DataFrame(json.loads(getCurrency(currencyParams))['data'])
@@ -123,27 +123,43 @@ def getCurrencyDataFrame(currencyParams):
     ##########################################normalizing data###########################################################
     dfTimeStamp2['strong_bullish'] = dfTimeStamp2.apply(strongBullishCandle, axis=1)
     dfTimeStamp2['symbol'] = currencyParams['symbol']
+    dfVolume = dfTimeStamp2.copy()
+    dfVolume['last_day_volume'] = dfVolume['Volume'].shift(periods=-1)
+    dfVolume['strong_volume'] = dfVolume.apply(lambda x: x['Volume'] > x['last_day_volume'], axis=1)
+    # finalDF = dfVolume.iloc[[1][:]]
     # return dfTimeStamp2.iloc[1:2]
-    return dfTimeStamp2
+    return dfVolume
 
 ScreenerDf = pd.DataFrame([],columns=defaultColumns,index=['candlestick_chart_close_time'])
+threeDaysAgo = datetime.now() - timedelta(days=3)
+threeDaysAgoInteger = int(threeDaysAgo.timestamp() * 1000)
 test = []
-for i in tqdm(dfAllCurrencies['symbol']):
-    currencyParams = {
-    "symbol": f"{i}",
+# for i in tqdm(dfAllCurrencies['symbol']):
+#     currencyParams = {
+#     "symbol": f"{i}",
+#     "interval": "1d",
+#     # "startTime": f"{1691769599999}",
+#     # "startTime": 1693238400000,
+#     "startTime": thregetCurrencyDataFrameeDaysAgoInteger,
+#     # "endTime": 1693497600000,
+#     }
+#     try:
+#         dfCurrency = getCurrencyDataFrame(currencyParams)
+#         test.append(dfCurrency)
+#     except Exception as e:
+#         print(e)
+#         pass
+
+
+# test2 = pd.concat(test)
+
+
+# with pd.ExcelWriter(r"C:\Users\acer\Desktop\screener_data.xlsx") as writer:
+#     test2.to_excel(writer)
+symbol = 'CYBER-USDT'
+currencyParams = {
+    "symbol": symbol,
     "interval": "1d",
-    "startTime": f"{1691769599999}",
-    # "endTime": f"{1691855999999}",
-    }
-    try:
-        dfCurrency = getCurrencyDataFrame(currencyParams)
-        test.append(dfCurrency)
-    except Exception as e:
-        print(e)
-        pass
-
-
-test2 = pd.concat(test)
-
-with pd.ExcelWriter(r"C:\Users\acer\Desktop\screener_data.xlsx") as writer:
-    test2.to_excel(writer)
+    # "startTime": threeDaysAgoInteger,
+}
+testDf = getCurrencyDataFrame(currencyParams)
