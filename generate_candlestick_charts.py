@@ -7,7 +7,11 @@ from tqdm import tqdm
 from bingx import saveCandleStickChart,strongCloseCandle,strongCandle,showCandleStickChart,strongBody,strongBullishCandle,strongBerishCandle
 from bingx import strongBearishSignal,strongBullishSignal,strongBullishSignalBar,bullishCloseAbovePastBars,openBelowLastDayClose
 
-currencies = glob('data/*.xlsx')
+h4_time_frame = "4h"
+h1_time_frame = "1h"
+d1_time_frame = "1d"
+
+currencies = glob(f"data/{h4_time_frame}/*.xlsx")
 charts = glob('charts/*/*.png')
 charts = [os.path.join(os.path.dirname(__file__),i) for i in charts]
 for i in charts:

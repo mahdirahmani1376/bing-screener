@@ -18,6 +18,9 @@ from aiolimiter import AsyncLimiter
 MAX_CONCURRENT = 8
 RATE_LIMIT_IN_SECOND = 8
 limiter = AsyncLimiter(RATE_LIMIT_IN_SECOND, 1.0)
+h4_time_frame = "4h"
+h1_time_frame = "1h"
+d1_time_frame = "1d"
 
 with open('credentials.json') as file:
     jsonFile = json.load(file)
@@ -31,11 +34,7 @@ lastDay = (datetime.now() - timedelta(days=1)).strftime(timeStampFormat)
 
 defaultCurrenCyParamsMap = {
     "symbol": "BTC-USDT",
-    "interval": "1d",
-    # "startTime": 5,
-    # "startTime": 0,
-    # "endTime": 0,
-    # "limit": 0
+    "interval": f"{h4_time_frame}",
 }
 
 defaultColumns = [
@@ -63,7 +62,7 @@ async def main(dfAllCurrencies):
         for i in (dfAllCurrencies['symbol']):
             currencyParams = {
                 "symbol": f"{i}",
-                "interval": "1d",
+                "interval": f"{h1_time_frame}",
                 "startTime": startTime,
             }
             paramsStr = praseParam(currencyParams)
@@ -247,7 +246,7 @@ def getCurrencyDataFrame(data,currencyParams):
     #     path = f"charts/{currencyParams['symbol']}.png"
     #     saveCandleStickChart(dfvolume, path)
 
-    with pd.ExcelWriter(f"data/{currencyParams['symbol']}.xlsx") as dfVolumeWriter:
+    with pd.ExcelWriter(f"data/{h1_time_frame}/{currencyParams['symbol']}.xlsx") as dfVolumeWriter:
         dfvolume.to_excel(dfVolumeWriter)
     # return dfvolume
 
@@ -256,10 +255,11 @@ def getCurrencyDataFrame(data,currencyParams):
 if __name__ == '__main__':
     dfAllCurrencies = pd.json_normalize(json.loads(getAllCurrencies())['data']['symbols'])
     ScreenerDf = pd.DataFrame([], columns=defaultColumns, index=['candlestick_chart_close_time'])
-    startTime = datetime.now() - timedelta(days=30)
+    # startTime = datetime.now() - timedelta(days=30)
+    startTime = datetime.now() - timedelta(days=7)
     startTime = int(startTime.timestamp() * 1000)
     results = asyncio.run(main(dfAllCurrencies))
     finalDf = pd.concat(results)
 
-    with pd.ExcelWriter(r"screener_data.xlsx") as writer:
+    with pd.ExcelWriter(r"screener_data_h1.xlsx") as writer:
         finalDf.to_excel(writer)
