@@ -149,15 +149,22 @@ def showCandleStickChart(dataframe):
     fig = go.Figure(data=[candlestick])
 
     fig.show()
+def strongBullishSignalBar(row):
+    return strongBullishSignal(row) and (row['last_day_close'] - row['last_day_close'] * 0.05) < row['open'] < (row['last_day_close'] + row['last_day_close'] * 0.05)
 
+def openBelowLastDayClose(row):
+    return row['open'] < row['last_day_open']
+
+def bullishCloseAbovePastBars(index,df,value):
+    return value > df.iloc[index+1,index+20]['close'].max
 def strongCandle(row):
     return strongEngulf(row) and strongBody(row)
 
 def strongBearishSignal(row):
-    return strongCandle(row) and strongBerishCandle(row)
+    return strongCandle(row) and strongBerishCandle(row) and spikeBearishCandle(row)
 
 def strongBullishSignal(row):
-    return strongCandle(row) and strongBullishCandle(row)
+    return strongCandle(row) and strongBullishCandle(row) and spikeBullishCandle(row)
 def strongBody(row):
     return abs(row['close'] - row['open']) > (abs(row['high'] - row['low'])/3)
 def strongCloseCandle(row):
@@ -165,6 +172,12 @@ def strongCloseCandle(row):
 
 def strongBullishCandle(row):
     return (row['close'] >= row['high'] * 0.99) and (row['close'] > row['open'])
+
+def spikeBullishCandle(row):
+    return row['close'] > row['last_day_low'] + 3 * (row['last_day_close'] - row['last_day_low'])
+
+def spikeBearishCandle(row):
+    return row['close'] < row['last_day_high'] - 3 * (row['last_day_close'] - row['last_day_high'])
 def strongBerishCandle(row):
     return (row['close'] >= row['low'] * 0.99) and (row['close'] < row['open'])
 
@@ -206,12 +219,33 @@ def getCurrencyDataFrame(data,currencyParams):
     dfvolume['last_day_volume'] = dfvolume['volume'].shift(periods=-1)
     dfvolume['last_day_open'] = dfvolume['open'].shift(periods=-1)
     dfvolume['last_day_close'] = dfvolume['close'].shift(periods=-1)
+    dfvolume['last_day_high'] = dfvolume['high'].shift(periods=-1)
+    dfvolume['last_day_low'] = dfvolume['low'].shift(periods=-1)
     dfvolume['strong_volume'] = dfvolume.apply(lambda x: x['volume'] > 3 * (x['last_day_volume']), axis=1)
     dfvolume['strong_engulf'] = dfvolume.apply(strongEngulf,axis=1)
-    saveImageCheck = True in dfvolume.iloc[0:7]['strong_engulf'].values
-    if saveImageCheck:
-        path = f"charts/{currencyParams['symbol']}.png"
-        saveCandleStickChart(dfvolume, path)
+    dfvolume['strong_close'] = dfvolume.apply(strongCloseCandle, axis=1)
+    dfvolume['strong_body'] = dfvolume.apply(strongBody, axis=1)
+    dfvolume['strong'] = dfvolume.apply(strongCandle, axis=1)
+    dfvolume['strong_bullish_signal'] = dfvolume.apply(strongBullishSignal, axis=1)
+    dfvolume['strong_bearish_signal'] = dfvolume.apply(strongBearishSignal, axis=1)
+    dfvolume['strong_bullish_signal_bar'] = dfvolume.apply(strongBullishSignalBar, axis=1)
+    dfvolume['open_below_last_day_close'] = dfvolume.apply(openBelowLastDayClose, axis=1)
+
+    strongBullishCloseList = []
+    strongBearishCloseList = []
+    for index, value in enumerate(dfvolume['close']):
+        bullishValueToAppend = value > dfvolume.iloc[index + 1:index + 4]['close'].max()
+        bearishValueToAppend = value < dfvolume.iloc[index + 1:index + 4]['close'].min()
+        strongBullishCloseList.append(bullishValueToAppend)
+        strongBearishCloseList.append(bearishValueToAppend)
+
+    dfvolume['strong_bullish_close_past_bars_before'] = strongBullishCloseList
+    dfvolume['strong_bearish_close_past_bars_before'] = strongBearishCloseList
+
+    # saveImageCheck = True in dfvolume.iloc[0:7]['strong_engulf'].values
+    # if saveImageCheck:
+    #     path = f"charts/{currencyParams['symbol']}.png"
+    #     saveCandleStickChart(dfvolume, path)
 
     with pd.ExcelWriter(f"data/{currencyParams['symbol']}.xlsx") as dfVolumeWriter:
         dfvolume.to_excel(dfVolumeWriter)
