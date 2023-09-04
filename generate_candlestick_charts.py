@@ -10,8 +10,9 @@ from bingx import strongBearishSignal,strongBullishSignal,strongBullishSignalBar
 h4_time_frame = "4h"
 h1_time_frame = "1h"
 d1_time_frame = "1d"
+time_frame = h4_time_frame
 
-currencies = glob(f"data/{h4_time_frame}/*.xlsx")
+currencies = glob(f"data/{time_frame}/*.xlsx")
 charts = glob('charts/*/*.png')
 charts = [os.path.join(os.path.dirname(__file__),i) for i in charts]
 for i in charts:
@@ -53,7 +54,7 @@ for i in tqdm(currencies):
         df['strong_bullish_close_past_bars_before'] = strongBullishCloseList
         df['strong_bearish_close_past_bars_before'] = strongBearishCloseList
 
-        dfFinal = df.iloc[1:2]
+        dfFinal = df.iloc[1:5]
         # dfFinal = df
         if (True in dfFinal['strong_bullish_signal'].values) and (True in dfFinal['strong_bullish_close_past_bars_before'].values):
             path = f"charts/bullish/{dfFinal['symbol'].values[0]}.png"

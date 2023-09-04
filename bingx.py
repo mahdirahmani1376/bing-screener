@@ -21,6 +21,7 @@ limiter = AsyncLimiter(RATE_LIMIT_IN_SECOND, 1.0)
 h4_time_frame = "4h"
 h1_time_frame = "1h"
 d1_time_frame = "1d"
+time_frame = h4_time_frame
 
 with open('credentials.json') as file:
     jsonFile = json.load(file)
@@ -30,11 +31,11 @@ with open('credentials.json') as file:
 APIURL = "https://open-api.bingx.com"
 
 timeStampFormat = '%Y-%m-%d %H:%M:%S'
-lastDay = (datetime.now() - timedelta(days=1)).strftime(timeStampFormat)
+# lastDay = (datetime.now() - timedelta(days=1)).strftime(timeStampFormat)
 
 defaultCurrenCyParamsMap = {
     "symbol": "BTC-USDT",
-    "interval": f"{h4_time_frame}",
+    "interval": f"{time_frame}",
 }
 
 defaultColumns = [
@@ -62,7 +63,7 @@ async def main(dfAllCurrencies):
         for i in (dfAllCurrencies['symbol']):
             currencyParams = {
                 "symbol": f"{i}",
-                "interval": f"{h1_time_frame}",
+                "interval": f"{time_frame}",
                 "startTime": startTime,
             }
             paramsStr = praseParam(currencyParams)
@@ -124,7 +125,7 @@ def getCurrency(paramsMap):
 
 def convertToTimeStamp(x):
     timeoftest = datetime.utcfromtimestamp(float(x/1000))
-    timeoftest = timeoftest + timedelta(hours=4)
+    timeoftest = timeoftest + timedelta(minutes=(4*60)+30)
     timeoftest = timeoftest.strftime(timeStampFormat)
     return timeoftest
 
@@ -233,8 +234,8 @@ def getCurrencyDataFrame(data,currencyParams):
     strongBullishCloseList = []
     strongBearishCloseList = []
     for index, value in enumerate(dfvolume['close']):
-        bullishValueToAppend = value > dfvolume.iloc[index + 1:index + 4]['close'].max()
-        bearishValueToAppend = value < dfvolume.iloc[index + 1:index + 4]['close'].min()
+        bullishValueToAppend = value > dfvolume.iloc[index + 1:index + 7]['close'].max()
+        bearishValueToAppend = value < dfvolume.iloc[index + 1:index + 7]['close'].min()
         strongBullishCloseList.append(bullishValueToAppend)
         strongBearishCloseList.append(bearishValueToAppend)
 
@@ -246,7 +247,7 @@ def getCurrencyDataFrame(data,currencyParams):
     #     path = f"charts/{currencyParams['symbol']}.png"
     #     saveCandleStickChart(dfvolume, path)
 
-    with pd.ExcelWriter(f"data/{h1_time_frame}/{currencyParams['symbol']}.xlsx") as dfVolumeWriter:
+    with pd.ExcelWriter(f"data/{time_frame}/{currencyParams['symbol']}.xlsx") as dfVolumeWriter:
         dfvolume.to_excel(dfVolumeWriter)
     # return dfvolume
 
@@ -261,5 +262,5 @@ if __name__ == '__main__':
     results = asyncio.run(main(dfAllCurrencies))
     finalDf = pd.concat(results)
 
-    with pd.ExcelWriter(r"screener_data_h1.xlsx") as writer:
+    with pd.ExcelWriter(r"screener_data_h4.xlsx") as writer:
         finalDf.to_excel(writer)
