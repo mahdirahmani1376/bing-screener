@@ -10,10 +10,10 @@ from bingx import strongBearishSignal,strongBullishSignal,strongBullishSignalBar
 h4_time_frame = "4h"
 h1_time_frame = "1h"
 d1_time_frame = "1d"
-time_frame = h4_time_frame
+time_frame = d1_time_frame
 
 currencies = glob(f"data/{time_frame}/*.xlsx")
-charts = glob('charts/*/*.png')
+charts = glob(f"charts/{time_frame}/*.png")
 charts = [os.path.join(os.path.dirname(__file__),i) for i in charts]
 for i in charts:
     if os.path.isfile(i):
@@ -54,13 +54,21 @@ for i in tqdm(currencies):
         df['strong_bullish_close_past_bars_before'] = strongBullishCloseList
         df['strong_bearish_close_past_bars_before'] = strongBearishCloseList
 
-        dfFinal = df.iloc[1:5]
+        dfFinal = df.iloc[1:7]
         # dfFinal = df
         if (True in dfFinal['strong_bullish_signal'].values) and (True in dfFinal['strong_bullish_close_past_bars_before'].values):
-            path = f"charts/bullish/{dfFinal['symbol'].values[0]}.png"
+            savePathBullish = f"charts/{time_frame}/bullish"
+            if not os.path.exists(savePathBullish):
+                os.makedirs(savePathBullish)
+
+            path = os.path.join(savePathBullish,f"{dfFinal['symbol'].values[0]}.png")
             saveCandleStickChart(df,path)
         if (True in dfFinal['strong_bearish_signal'].values) and (True in dfFinal['strong_bearish_close_past_bars_before'].values):
-            path = f"charts/bearish/{dfFinal['symbol'].values[0]}.png"
+            savePathBearish = f"charts/{time_frame}/bearish"
+            if not os.path.exists(savePathBearish):
+                os.makedirs(savePathBearish)
+
+            path = os.path.join(savePathBearish,f"{dfFinal['symbol'].values[0]}.png")
             saveCandleStickChart(df,path)
     except Exception as e:
         print(filepath)
