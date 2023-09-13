@@ -1,3 +1,11 @@
 credentials.json
 charts/*/*
 data/*/*
+/.venv/bin/python
+/.venv/bin/python3
+/.venv/bin/python3.10
+/.venv/lib64
+/.venv/pyvenv.cfg
+/projectsbing-screener.venv/
+/wsl$Ubuntuhomemahdipersonal/
+/.venv/
