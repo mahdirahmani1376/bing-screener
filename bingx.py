@@ -21,7 +21,7 @@ limiter = AsyncLimiter(RATE_LIMIT_IN_SECOND, 1.0)
 h4_time_frame = "4h"
 h1_time_frame = "1h"
 d1_time_frame = "1d"
-time_frame = d1_time_frame
+time_frame = h4_time_frame
 
 with open('credentials.json') as file:
     jsonFile = json.load(file)
@@ -149,6 +149,8 @@ def showCandleStickChart(dataframe):
     fig = go.Figure(data=[candlestick])
 
     fig.show()
+
+
 def strongBullishSignalBar(row):
     return strongBullishSignal(row) and (row['last_day_close'] - row['last_day_close'] * 0.05) < row['open'] < (row['last_day_close'] + row['last_day_close'] * 0.05)
 
@@ -174,10 +176,10 @@ def strongBullishCandle(row):
     return (row['close'] >= row['high'] * 0.99) and (row['close'] > row['open'])
 
 def spikeBullishCandle(row):
-    return row['close'] > row['last_day_low'] + 3 * (row['last_day_close'] - row['last_day_low'])
+    return row['close'] > row['last_day_low'] + 3 * (row['last_day_close'] - row['last_day_low']) and row['close'] > (row['last_day_high'])
 
 def spikeBearishCandle(row):
-    return row['close'] < row['last_day_high'] - 3 * (row['last_day_close'] - row['last_day_high'])
+    return row['close'] < row['last_day_high'] - 3 * (row['last_day_close'] - row['last_day_high']) and row['close'] < (row['last_day_high'])
 def strongBerishCandle(row):
     return (row['close'] >= row['low'] * 0.99) and (row['close'] < row['open'])
 
@@ -185,6 +187,9 @@ def strongEngulf(row):
     return abs(row['close'] - row['open']) > abs(3 * (row['last_day_close'] - row['last_day_open']))
 
 ###################################################################################################################
+def strongRatio(row):
+    return row['close'] > row['last_day_low'] + 6 * (row['last_day_close'] - row['last_day_low'])
+
 def saveCandleStickChart(dataframe,path):
     candlestick = go.Candlestick(
                             x=dataframe.index,
@@ -230,6 +235,7 @@ def getCurrencyDataFrame(data,currencyParams):
     dfvolume['strong_bearish_signal'] = dfvolume.apply(strongBearishSignal, axis=1)
     dfvolume['strong_bullish_signal_bar'] = dfvolume.apply(strongBullishSignalBar, axis=1)
     dfvolume['open_below_last_day_close'] = dfvolume.apply(openBelowLastDayClose, axis=1)
+    dfvolume['strong_ratio'] = dfvolume.apply(strongRatio, axis=1)
 
     strongBullishCloseList = []
     strongBearishCloseList = []
