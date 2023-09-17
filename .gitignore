@@ -7,5 +7,6 @@ data/*/*
 /.venv/lib64
 /.venv/pyvenv.cfg
 /projectsbing-screener.venv/
-/wsl$Ubuntuhomemahdipersonal/
+/wsl$Ubuntuhomemahdipersonal/*
 /.venv/
+/wsl$Ubuntuhomemahdipersonal/

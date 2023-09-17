@@ -4,6 +4,8 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/charts" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
+      <excludeFolder url="file://$MODULE_DIR$/.venv" />
+      <excludeFolder url="file://$MODULE_DIR$/projectsbing-screener.venv" />
     </content>
     <orderEntry type="jdk" jdkName="/usr/bin/python3.10 (2)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

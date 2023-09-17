@@ -63,13 +63,13 @@ for i in tqdm(currencies):
 
             path = os.path.join(savePathBullish,f"{dfFinal['symbol'].values[0]}.png")
             saveCandleStickChart(df,path)
-        if (True in dfFinal['strong_bearish_signal'].values or True in dfFinal['strong_ratio'].values) and (True in dfFinal['strong_bearish_close_past_bars_before'].values):
-            savePathBearish = f"charts/{time_frame}/bearish"
-            if not os.path.exists(savePathBearish):
-                os.makedirs(savePathBearish)
+        # if (True in dfFinal['strong_bearish_signal'].values or True in dfFinal['strong_ratio'].values) and (True in dfFinal['strong_bearish_close_past_bars_before'].values):
+        #     savePathBearish = f"charts/{time_frame}/bearish"
+        #     if not os.path.exists(savePathBearish):
+        #         os.makedirs(savePathBearish)
 
-            path = os.path.join(savePathBearish,f"{dfFinal['symbol'].values[0]}.png")
-            saveCandleStickChart(df,path)
+            # path = os.path.join(savePathBearish,f"{dfFinal['symbol'].values[0]}.png")
+            # saveCandleStickChart(df,path)
     except Exception as e:
         print(filepath)
         print(e)
