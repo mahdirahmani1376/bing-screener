@@ -1,11 +1,9 @@
 from glob import glob
+from bingx import *
 import os
 import pandas as pd
 import plotly.graph_objects as go
 from tqdm import tqdm
-
-from bingx import saveCandleStickChart,strongCloseCandle,strongCandle,showCandleStickChart,strongBody,strongBullishCandle,strongBerishCandle
-from bingx import strongBearishSignal,strongBullishSignal,strongBullishSignalBar,bullishCloseAbovePastBars,openBelowLastDayClose,strongRatio
 
 h4_time_frame = "4h"
 h1_time_frame = "1h"
@@ -31,18 +29,6 @@ for i in tqdm(currencies):
 
         df.set_index('candlestick_chart_close_time',inplace=True)
 
-        df['last_day_high'] = df['high'].shift(periods=-1)
-        df['last_day_low'] = df['low'].shift(periods=-1)
-
-        df['strong_close'] = df.apply(strongCloseCandle,axis=1)
-        df['strong_body'] = df.apply(strongBody,axis=1)
-        df['strong'] = df.apply(strongCandle,axis=1)
-        df['strong_bullish_signal'] = df.apply(strongBullishSignal,axis=1)
-        df['strong_bearish_signal'] = df.apply(strongBearishSignal,axis=1)
-        df['strong_bullish_signal_bar'] = df.apply(strongBullishSignalBar,axis=1)
-        df['open_below_last_day_close'] = df.apply(openBelowLastDayClose,axis=1)
-        df['strong_ratio'] = df.apply(strongRatio, axis=1)
-
         strongBullishCloseList = []
         strongBearishCloseList = []
         for index, value in enumerate(df['close']):
@@ -53,23 +39,33 @@ for i in tqdm(currencies):
 
         df['strong_bullish_close_past_bars_before'] = strongBullishCloseList
         df['strong_bearish_close_past_bars_before'] = strongBearishCloseList
+        dfFinal = df.iloc[1:6]
 
-        dfFinal = df.iloc[1:2]
-        # dfFinal = df
+        crypto_meter_data = ""
+        if with_crypto_meter:
+            df_join = pd.read_excel('screener_data_h4.xlsx').set_index('candlestick_chart_close_time')
+            volume_mcap = round(df_join[df_join['symbol'] == dfFinal['symbol'].values[0]]['volume_mcap'].values[0], 3)
+            rank = df_join[df_join['symbol'] == dfFinal['symbol'].values[0]]['rank'].values[0]
+            if pd.isna(volume_mcap):
+                crypto_meter_data = f""
+            else:
+                crypto_meter_data = f"r_{int(rank)}_v_{volume_mcap}"
+
+
         if (True in dfFinal['strong_bullish_signal'].values or True in dfFinal['strong_ratio'].values) and (True in dfFinal['strong_bullish_close_past_bars_before'].values):
             savePathBullish = f"charts/{time_frame}/bullish"
             if not os.path.exists(savePathBullish):
                 os.makedirs(savePathBullish)
 
-            path = os.path.join(savePathBullish,f"{dfFinal['symbol'].values[0]}.png")
+            path = os.path.join(savePathBullish,f"{dfFinal['symbol'].values[0]}_{crypto_meter_data}.png")
             saveCandleStickChart(df,path)
         # if (True in dfFinal['strong_bearish_signal'].values or True in dfFinal['strong_ratio'].values) and (True in dfFinal['strong_bearish_close_past_bars_before'].values):
         #     savePathBearish = f"charts/{time_frame}/bearish"
         #     if not os.path.exists(savePathBearish):
         #         os.makedirs(savePathBearish)
-
-            # path = os.path.join(savePathBearish,f"{dfFinal['symbol'].values[0]}.png")
-            # saveCandleStickChart(df,path)
+        #
+        #     path = os.path.join(savePathBearish,f"{dfFinal['symbol'].values[0]}_{volume_mcap}.png")
+        #     saveCandleStickChart(df,path)
     except Exception as e:
         print(filepath)
         print(e)
