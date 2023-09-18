@@ -1,7 +1,19 @@
+import pandas as pd
 from crypto_meter import get_crypto_meter_dataframe
 from helper_functions import *
+from coin_market_cap import get_coin_market_cap_df
 
-with_crypto_meter = True
+with_crypto_meter = False
+
+# h4_time_frame = "4h"
+# h1_time_frame = "1h"
+# d1_time_frame = "1d"
+# time_frame = d1_time_frame
+
+if with_crypto_meter:
+    df_crypto_meter = get_crypto_meter_dataframe()
+
+df_coin_market_cap = get_coin_market_cap_df()
 
 
 async def main(dfAllCurrencies):
@@ -80,15 +92,18 @@ def getCurrencyDataFrame(data, currencyParams):
     dfvolume['strong_bullish_close_past_bars_before'] = strongBullishCloseList
     dfvolume['strong_bearish_close_past_bars_before'] = strongBearishCloseList
 
+    df_return = dfvolume.iloc[[1][:]]
+    df_volume_cmc = pd.merge(left=df_return.reset_index(), right=df_coin_market_cap, left_on='symbol', right_on='symbol',
+                             how='left').set_index('candlestick_chart_close_time')
+
     with pd.ExcelWriter(f"data/{time_frame}/{currencyParams['symbol']}.xlsx") as dfVolumeWriter:
         dfvolume.to_excel(dfVolumeWriter)
 
     if with_crypto_meter:
-        df_crypto_meter = get_crypto_meter_dataframe()
-        return pd.merge(dfvolume.iloc[[1][:]].reset_index(), df_crypto_meter, how='left', left_on='symbol',
+        return pd.merge(df_volume_cmc.reset_index(), df_crypto_meter, how='left', left_on='symbol',
                         right_on='name').set_index('candlestick_chart_close_time')
     else:
-        return dfvolume.iloc[[1][:]]
+        return df_volume_cmc
 
 
 ###################################################################################################################
@@ -101,5 +116,5 @@ if __name__ == '__main__':
     results = asyncio.run(main(dfAllCurrencies))
     finalDf = pd.concat(results)
 
-    with pd.ExcelWriter(r"screener_data_h4.xlsx") as writer:
+    with pd.ExcelWriter(f"screener_data_{time_frame}.xlsx") as writer:
         finalDf.to_excel(writer)

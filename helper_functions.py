@@ -14,6 +14,12 @@ import os
 import aiohttp
 import asyncio
 from aiolimiter import AsyncLimiter
+
+h4_time_frame = "4h"
+h1_time_frame = "1h"
+d1_time_frame = "1d"
+time_frame = d1_time_frame
+
 with open('credentials.json') as file:
     jsonFile = json.load(file)
     APIKEY = jsonFile['API_KEY']
@@ -25,10 +31,7 @@ timeStampFormat = '%Y-%m-%d %H:%M:%S'
 MAX_CONCURRENT = 8
 RATE_LIMIT_IN_SECOND = 16
 limiter = AsyncLimiter(RATE_LIMIT_IN_SECOND, 1.0)
-h4_time_frame = "4h"
-h1_time_frame = "1h"
-d1_time_frame = "1d"
-time_frame = h4_time_frame
+
 
 with open('credentials.json') as file:
     jsonFile = json.load(file)
