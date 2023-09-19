@@ -4,11 +4,16 @@ import os
 import pandas as pd
 import plotly.graph_objects as go
 from tqdm import tqdm
+from bingx_perpetual_list import get_perpetual_df
+
 
 # h4_time_frame = "4h"
 # h1_time_frame = "1h"
 # d1_time_frame = "1d"
 # time_frame = h4_time_frame
+how_many_candles_before=4
+volume_mcap = ""
+filepath = ""
 
 currencies = glob(f"data/{time_frame}/*.xlsx")
 charts = glob(f"charts/{time_frame}/**/*.png",recursive=True)
@@ -17,7 +22,7 @@ for i in charts:
     if os.path.isfile(i):
         os.remove(i)
 
-
+df_perpetual = get_perpetual_df()
 
 for i in tqdm(currencies):
     try:
@@ -37,7 +42,7 @@ for i in tqdm(currencies):
 
         df['strong_bullish_close_past_bars_before'] = strongBullishCloseList
         df['strong_bearish_close_past_bars_before'] = strongBearishCloseList
-        dfFinal = df.iloc[1:6]
+        dfFinal = df.iloc[1:how_many_candles_before]
 
         crypto_meter_data = ""
         if with_crypto_meter:
@@ -60,13 +65,16 @@ for i in tqdm(currencies):
 
             path = os.path.join(savePathBullish,f"{dfFinal['symbol'].values[0]}_cm_{crypto_meter_data}_cmc_{volume_coin_mcap}.png")
             saveCandleStickChart(df,path)
-        # if (True in dfFinal['strong_bearish_signal'].values or True in dfFinal['strong_ratio'].values) and (True in dfFinal['strong_bearish_close_past_bars_before'].values):
-        #     savePathBearish = f"charts/{time_frame}/bearish"
-        #     if not os.path.exists(savePathBearish):
-        #         os.makedirs(savePathBearish)
-        #
-        #     path = os.path.join(savePathBearish,f"{dfFinal['symbol'].values[0]}_{volume_mcap}.png")
-        #     saveCandleStickChart(df,path)
+
+        if (True in dfFinal['strong_bearish_signal'].values or True in dfFinal['strong_ratio'].values) and (True in dfFinal['strong_bearish_close_past_bars_before'].values):
+            if dfFinal['symbol'].values[0] in df_perpetual['symbol'].values:
+                savePathBearish = f"charts/{time_frame}/bearish"
+                if not os.path.exists(savePathBearish):
+                    os.makedirs(savePathBearish)
+
+                path = os.path.join(savePathBearish,f"{dfFinal['symbol'].values[0]}_{volume_mcap}.png")
+                saveCandleStickChart(df,path)
+
     except Exception as e:
         print(filepath)
         print(e)

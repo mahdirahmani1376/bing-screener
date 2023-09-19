@@ -9,6 +9,7 @@ with_crypto_meter = False
 # h1_time_frame = "1h"
 # d1_time_frame = "1d"
 # time_frame = d1_time_frame
+count_of_strong_close_bars = 6
 
 if with_crypto_meter:
     df_crypto_meter = get_crypto_meter_dataframe()
@@ -84,8 +85,8 @@ def getCurrencyDataFrame(data, currencyParams):
     strongBullishCloseList = []
     strongBearishCloseList = []
     for index, value in enumerate(dfvolume['close']):
-        bullishValueToAppend = value > dfvolume.iloc[index + 1:index + 7]['close'].max()
-        bearishValueToAppend = value < dfvolume.iloc[index + 1:index + 7]['close'].min()
+        bullishValueToAppend = value > dfvolume.iloc[index + 1:index + count_of_strong_close_bars]['close'].max()
+        bearishValueToAppend = value < dfvolume.iloc[index + 1:index + count_of_strong_close_bars]['close'].min()
         strongBullishCloseList.append(bullishValueToAppend)
         strongBearishCloseList.append(bearishValueToAppend)
 
