@@ -32,15 +32,6 @@ MAX_CONCURRENT = 8
 RATE_LIMIT_IN_SECOND = 16
 limiter = AsyncLimiter(RATE_LIMIT_IN_SECOND, 1.0)
 
-
-with open('credentials.json') as file:
-    jsonFile = json.load(file)
-    APIKEY = jsonFile['API_KEY']
-    SECRETKEY = jsonFile['SECRET_KEY']
-
-APIURL = "https://open-api.bingx.com"
-
-timeStampFormat = '%Y-%m-%d %H:%M:%S'
 # lastDay = (datetime.now() - timedelta(days=1)).strftime(timeStampFormat)
 
 defaultCurrenCyParamsMap = {
@@ -63,7 +54,7 @@ defaultColumns = [
 
 def convertToTimeStamp(x):
     timeoftest = datetime.utcfromtimestamp(float(x/1000))
-    timeoftest = timeoftest + timedelta(minutes=(4*60)+30)
+    timeoftest = timeoftest + timedelta(minutes=(3*60)+30)
     timeoftest = timeoftest.strftime(timeStampFormat)
     return timeoftest
 def get_sign(api_secret, payload):
