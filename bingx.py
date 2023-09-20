@@ -2,6 +2,7 @@ import pandas as pd
 from crypto_meter import get_crypto_meter_dataframe
 from helper_functions import *
 from coin_market_cap import get_coin_market_cap_df
+from indicator_filter import adx_signal
 
 with_crypto_meter = False
 
@@ -58,6 +59,7 @@ async def sendAsyncRequest(session, path, urlpa, currencyParams):
 ##################################################################################################
 def getCurrencyDataFrame(data, currencyParams):
     dfCurrency = pd.DataFrame(json.loads(data)['data'])
+    dfCurrency.sort_index(inplace=True, ascending=True)
     ##########################################normalizing data###########################################################
     dfCurrency.columns = defaultColumns
     dfTimeStamp = dfCurrency.copy()
@@ -81,6 +83,9 @@ def getCurrencyDataFrame(data, currencyParams):
     dfvolume['strong_bullish_signal'] = dfvolume.apply(strongBullishSignal, axis=1)
     dfvolume['strong_bearish_signal'] = dfvolume.apply(strongBearishSignal, axis=1)
     dfvolume['strong_ratio'] = dfvolume.apply(strongRatio, axis=1)
+    df_adx = dfCurrency.ta.adx(high=dfvolume['high'], low=dfvolume['low'], close=dfvolume['close'], length=14)
+    dfvolume = pd.concat([dfvolume, df_adx], axis=1, join='inner')
+    dfvolume['adx_rating'] = dfvolume.apply(adx_signal, axis=1)
 
     strongBullishCloseList = []
     strongBearishCloseList = []
