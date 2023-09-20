@@ -2,6 +2,7 @@ import pandas as pd
 from crypto_meter import get_crypto_meter_dataframe
 from helper_functions import *
 from coin_market_cap import get_coin_market_cap_df
+from indicator_filter import adx_signal
 
 with_crypto_meter = False
 
@@ -9,6 +10,7 @@ with_crypto_meter = False
 # h1_time_frame = "1h"
 # d1_time_frame = "1d"
 # time_frame = d1_time_frame
+count_of_strong_close_bars = 6
 
 if with_crypto_meter:
     df_crypto_meter = get_crypto_meter_dataframe()
@@ -57,6 +59,7 @@ async def sendAsyncRequest(session, path, urlpa, currencyParams):
 ##################################################################################################
 def getCurrencyDataFrame(data, currencyParams):
     dfCurrency = pd.DataFrame(json.loads(data)['data'])
+    dfCurrency.sort_index(inplace=True, ascending=True)
     ##########################################normalizing data###########################################################
     dfCurrency.columns = defaultColumns
     dfTimeStamp = dfCurrency.copy()
@@ -80,12 +83,15 @@ def getCurrencyDataFrame(data, currencyParams):
     dfvolume['strong_bullish_signal'] = dfvolume.apply(strongBullishSignal, axis=1)
     dfvolume['strong_bearish_signal'] = dfvolume.apply(strongBearishSignal, axis=1)
     dfvolume['strong_ratio'] = dfvolume.apply(strongRatio, axis=1)
+    df_adx = dfCurrency.ta.adx(high=dfvolume['high'], low=dfvolume['low'], close=dfvolume['close'], length=14)
+    dfvolume = pd.concat([dfvolume, df_adx], axis=1, join='inner')
+    dfvolume['adx_rating'] = dfvolume.apply(adx_signal, axis=1)
 
     strongBullishCloseList = []
     strongBearishCloseList = []
     for index, value in enumerate(dfvolume['close']):
-        bullishValueToAppend = value > dfvolume.iloc[index + 1:index + 7]['close'].max()
-        bearishValueToAppend = value < dfvolume.iloc[index + 1:index + 7]['close'].min()
+        bullishValueToAppend = value > dfvolume.iloc[index + 1:index + count_of_strong_close_bars]['close'].max()
+        bearishValueToAppend = value < dfvolume.iloc[index + 1:index + count_of_strong_close_bars]['close'].min()
         strongBullishCloseList.append(bullishValueToAppend)
         strongBearishCloseList.append(bearishValueToAppend)
 
