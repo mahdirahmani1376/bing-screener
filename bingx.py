@@ -68,10 +68,10 @@ def getCurrencyDataFrame(data, currencyParams):
     df = pd.concat([df, df_adx], axis=1, join='inner')
     df['adx_rating'] = df.apply(adx_signal, axis=1)
     ##########################################normalizing data###########################################################
+    df = df.sort_index(ascending=False)
     df['strong_bullish'] = df.apply(strongBullishCandle, axis=1)
     df['strong_bearish'] = df.apply(strongBerishCandle, axis=1)
     df['symbol'] = currencyParams['symbol']
-    df = df.sort_index(ascending=False)
     df['last_day_volume'] = df['volume'].shift(periods=-1)
     df['last_day_open'] = df['open'].shift(periods=-1)
     df['last_day_close'] = df['close'].shift(periods=-1)
@@ -104,7 +104,6 @@ def getCurrencyDataFrame(data, currencyParams):
 
     volume_coin_mcap = ""
     rank = ""
-    df_coin_market_cap = get_coin_market_cap_df()
     volume_coin_mcap_series = df_coin_market_cap[df_coin_market_cap['symbol'] == df['symbol'].values[0]][
         'volume_mcap'].values
     if len(volume_coin_mcap_series) > 0:
@@ -134,6 +133,7 @@ def getCurrencyDataFrame(data, currencyParams):
 ###################################################################################################################
 
 if __name__ == '__main__':
+    df_coin_market_cap = get_coin_market_cap_df()
     dfAllCurrencies = pd.json_normalize(json.loads(getAllCurrencies())['data']['symbols'])
     ScreenerDf = pd.DataFrame([], columns=defaultColumns, index=['candlestick_chart_close_time'])
     startTime = datetime.now() - timedelta(days=7)
