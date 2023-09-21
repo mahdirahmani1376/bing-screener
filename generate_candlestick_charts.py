@@ -11,14 +11,13 @@ from indicator_filter import adx_signal
 # h1_time_frame = "1h"
 # d1_time_frame = "1d"
 # time_frame = h4_time_frame
-how_many_candles_before = 20
+how_many_candles_before = 2
 volume_mcap = ""
 filepath = ""
 
 currencies = glob(f"data/{time_frame}/*.xlsx")
 charts = glob(f"charts/{time_frame}/**/*.png", recursive=True)
 charts = [os.path.join(os.path.dirname(__file__), i) for i in charts]
-filepath = ""
 for i in charts:
     if os.path.isfile(i):
         os.remove(i)
@@ -29,7 +28,7 @@ for i in tqdm(currencies):
     try:
         filepath = os.path.join(os.path.dirname(__file__), i)
         df = pd.read_excel(filepath)
-        df = pd.read_excel("data//ARK-USDT.xlsx")
+        # df = pd.read_excel("data//ARK-USDT.xlsx")
 
         df.set_index('candlestick_chart_close_time', inplace=True)
 
@@ -53,11 +52,11 @@ for i in tqdm(currencies):
             volume_coin_mcap = round(volume_coin_mcap_series[0], 3)
         if (
                 (
-                True in dfFinal['strong_bullish_signal'].values
-                or True in dfFinal['strong_ratio'].values
+                        True in dfFinal['strong_bullish_signal'].values
+                        or True in dfFinal['strong_ratio'].values
                 )
                 and (True in dfFinal['strong_bullish_close_past_bars_before'].values)
-                # and (dfFinal['adx_rating'].values[0] > 0)
+                and (dfFinal['adx_rating'].values[0] > 0)
         ):
             savePathBullish = f"charts/{time_frame}/bullish"
             if not os.path.exists(savePathBullish):
@@ -67,12 +66,12 @@ for i in tqdm(currencies):
                                 f"{dfFinal['symbol'].values[0]}_cm_{crypto_meter_data}_cmc_{volume_coin_mcap}_rank{rank}.png")
             saveCandleStickChart(df, path)
 
-        if (    (
+        if ((
                 True in dfFinal['strong_bearish_signal'].values
                 or True in dfFinal['strong_ratio'].values
-                )
-                # and (True in dfFinal['strong_bearish_close_past_bars_before'].values)
-                # and (dfFinal['adx_rating'].values[0] < 0)
+        )
+                and (True in dfFinal['strong_bearish_close_past_bars_before'].values)
+                and (dfFinal['adx_rating'].values[0] < 0)
         ):
             if dfFinal['symbol'].values[0] in df_perpetual['symbol'].values:
                 savePathBearish = f"charts/{time_frame}/bearish"
