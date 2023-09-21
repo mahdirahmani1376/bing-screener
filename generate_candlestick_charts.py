@@ -29,27 +29,9 @@ for i in tqdm(currencies):
         filepath = os.path.join(os.path.dirname(__file__), i)
         df = pd.read_excel(filepath)
         # df = pd.read_excel("data//ARK-USDT.xlsx")
-
         df.set_index('candlestick_chart_close_time', inplace=True)
-
         dfFinal = df.iloc[1:how_many_candles_before]
 
-        crypto_meter_data = ""
-        if with_crypto_meter:
-            df_join = pd.read_excel('screener_data_h4.xlsx').set_index('candlestick_chart_close_time')
-            volume_mcap = round(df_join[df_join['symbol'] == dfFinal['symbol'].values[0]]['volume_mcap'].values[0], 3)
-            if pd.isna(volume_mcap):
-                crypto_meter_data = f""
-            else:
-                crypto_meter_data = f"_v_{volume_mcap}"
-
-        volume_coin_mcap = ""
-        rank = ""
-        volume_coin_mcap_series = df_coin_market_cap[df_coin_market_cap['symbol'] == dfFinal['symbol'].values[0]][
-            'volume_mcap'].values
-        if len(volume_coin_mcap_series) > 0:
-            rank = df_coin_market_cap[df_coin_market_cap['symbol'] == dfFinal['symbol'].values[0]]['cmc_rank'].values[0]
-            volume_coin_mcap = round(volume_coin_mcap_series[0], 3)
         if (
                 (
                         True in dfFinal['strong_bullish_signal'].values
@@ -59,11 +41,7 @@ for i in tqdm(currencies):
                 and (dfFinal['adx_rating'].values[0] > 0)
         ):
             savePathBullish = f"charts/{time_frame}/bullish"
-            if not os.path.exists(savePathBullish):
-                os.makedirs(savePathBullish)
-
-            path = os.path.join(savePathBullish,
-                                f"{dfFinal['symbol'].values[0]}_cm_{crypto_meter_data}_cmc_{volume_coin_mcap}_rank{rank}.png")
+            path = getSavePath(savePathBullish,dfFinal)
             saveCandleStickChart(df, path)
 
         if ((
@@ -75,10 +53,7 @@ for i in tqdm(currencies):
         ):
             if dfFinal['symbol'].values[0] in df_perpetual['symbol'].values:
                 savePathBearish = f"charts/{time_frame}/bearish"
-                if not os.path.exists(savePathBearish):
-                    os.makedirs(savePathBearish)
-
-                path = os.path.join(savePathBearish, f"{dfFinal['symbol'].values[0]}_{volume_mcap}.png")
+                path = getSavePath(savePathBearish, dfFinal)
                 saveCandleStickChart(df, path)
     except Exception as e:
         print(filepath)

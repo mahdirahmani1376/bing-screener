@@ -172,3 +172,9 @@ def saveCandleStickChart(dataframe,path):
     # fig.write_image(f"charts/{name}.png")
     fig.write_image(path)
 
+def getSavePath(savePath,dfFinal):
+    if not os.path.exists(savePath):
+        os.makedirs(savePath)
+    return os.path.join(savePath,
+                        f"""{dfFinal['symbol'].values[0]}_cm_{dfFinal['crypto_meter_data'].values[0]}_cmc_
+                                    {dfFinal['volume_coin_mcap'].values[0]}_rank{dfFinal['rank'].values[0]}.png""")

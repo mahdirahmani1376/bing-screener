@@ -15,9 +15,6 @@ count_of_strong_close_bars = 3
 if with_crypto_meter:
     df_crypto_meter = get_crypto_meter_dataframe()
 
-df_coin_market_cap = get_coin_market_cap_df()
-
-
 async def main(dfAllCurrencies):
     payload = {}
     path = '/openApi/spot/v1/market/kline'
@@ -96,6 +93,29 @@ def getCurrencyDataFrame(data, currencyParams):
 
     df['strong_bullish_close_past_bars_before'] = strongBullishCloseList
     df['strong_bearish_close_past_bars_before'] = strongBearishCloseList
+    ###########################################coin_market_cap#######################################################
+    crypto_meter_data = ""
+    if with_crypto_meter:
+        volume_mcap = round(df[df['symbol'] == df['symbol'].values[0]]['volume_mcap'].values[0], 3)
+        if pd.isna(volume_mcap):
+            crypto_meter_data = f""
+        else:
+            crypto_meter_data = f"_v_{volume_mcap}"
+
+    volume_coin_mcap = ""
+    rank = ""
+    df_coin_market_cap = get_coin_market_cap_df()
+    volume_coin_mcap_series = df_coin_market_cap[df_coin_market_cap['symbol'] == df['symbol'].values[0]][
+        'volume_mcap'].values
+    if len(volume_coin_mcap_series) > 0:
+        rank = df_coin_market_cap[df_coin_market_cap['symbol'] == df['symbol'].values[0]]['cmc_rank'].values[0]
+        volume_coin_mcap = round(volume_coin_mcap_series[0], 3)
+
+    df['volume_coin_mcap'] = volume_coin_mcap
+    df['crypto_meter_data'] = crypto_meter_data
+    df['rank'] = rank
+    ###########################################coin_marrket_cap#######################################################
+
 
     df_return = df.iloc[[1][:]]
     df_volume_cmc = pd.merge(left=df_return.reset_index(), right=df_coin_market_cap, left_on='symbol', right_on='symbol',
