@@ -11,7 +11,7 @@ from indicator_filter import adx_signal
 # h1_time_frame = "1h"
 # d1_time_frame = "1d"
 # time_frame = h4_time_frame
-how_many_candles_before = 2
+how_many_candles_before = 6
 volume_mcap = ""
 filepath = ""
 
