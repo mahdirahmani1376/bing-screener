@@ -11,7 +11,7 @@ from bingx_perpetual_list import get_perpetual_df
 # h1_time_frame = "1h"
 # d1_time_frame = "1d"
 # time_frame = h4_time_frame
-how_many_candles_before = 6
+how_many_candles_before = 2
 volume_mcap = ""
 filepath = ""
 

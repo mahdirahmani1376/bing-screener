@@ -137,7 +137,12 @@ if __name__ == '__main__':
     df_coin_market_cap = get_coin_market_cap_df()
     dfAllCurrencies = pd.json_normalize(json.loads(getAllCurrencies())['data']['symbols'])
     ScreenerDf = pd.DataFrame([], columns=defaultColumns, index=['candlestick_chart_close_time'])
-    startTime = datetime.now() - timedelta(days=9)
+    if time_frame == d1_time_frame:
+        startTime = datetime.now() - timedelta(days=30)
+    elif time_frame == h4_time_frame:
+        startTime = datetime.now() - timedelta(days=7)
+    elif time_frame == h1_time_frame:
+        startTime = datetime.now() - timedelta(days=1)
     startTime = int(startTime.timestamp() * 1000)
     results = asyncio.run(main(dfAllCurrencies))
     finalDf = pd.concat(results)

@@ -1,9 +1,13 @@
 def adx_signal(row):
-    if (row['DMP_14'] > row['DMN_14']) and (row['ADX_14'] > 20):
-        return 1
-    elif (row['DMN_14'] > row['DMP_14']) and (row['ADX_14'] > 20):
-        return -1
-    else:
+    try:
+        if (row['DMP_14'] > row['DMN_14']) and (row['ADX_14'] > 20):
+            return 1
+        elif (row['DMN_14'] > row['DMP_14']) and (row['ADX_14'] > 20):
+            return -1
+        else:
+            return 0
+    except Exception as e:
+        print(e)
         return 0
 
 def sma_10(row):
