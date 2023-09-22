@@ -1,8 +1,9 @@
 import pandas as pd
+import pandas_ta as ta
 from crypto_meter import get_crypto_meter_dataframe
 from helper_functions import *
 from coin_market_cap import get_coin_market_cap_df
-from indicator_filter import adx_signal
+from indicator_functions import adx_signal
 
 with_crypto_meter = False
 
@@ -10,7 +11,7 @@ with_crypto_meter = False
 # h1_time_frame = "1h"
 # d1_time_frame = "1d"
 # time_frame = d1_time_frame
-count_of_strong_close_bars = 3
+count_of_strong_close_bars = 6
 
 if with_crypto_meter:
     df_crypto_meter = get_crypto_meter_dataframe()
@@ -136,7 +137,7 @@ if __name__ == '__main__':
     df_coin_market_cap = get_coin_market_cap_df()
     dfAllCurrencies = pd.json_normalize(json.loads(getAllCurrencies())['data']['symbols'])
     ScreenerDf = pd.DataFrame([], columns=defaultColumns, index=['candlestick_chart_close_time'])
-    startTime = datetime.now() - timedelta(days=7)
+    startTime = datetime.now() - timedelta(days=9)
     startTime = int(startTime.timestamp() * 1000)
     results = asyncio.run(main(dfAllCurrencies))
     finalDf = pd.concat(results)
