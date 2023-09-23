@@ -3,7 +3,7 @@ import pandas_ta as ta
 from crypto_meter import get_crypto_meter_dataframe
 from helper_functions import *
 from coin_market_cap import get_coin_market_cap_df
-from indicator_functions import adx_signal
+from indicator_functions import adx_signal,atr_signal
 
 with_crypto_meter = False
 
@@ -66,8 +66,10 @@ def getCurrencyDataFrame(data, currencyParams):
     df = df.set_index('candlestick_chart_close_time').sort_index(ascending=True)
     #############################apllying indicators################################################
     df_adx = df.ta.adx(high=df['high'], low=df['low'], close=df['close'], length=14)
-    df = pd.concat([df, df_adx], axis=1, join='inner')
+    df_atr = df.ta.atr()
+    df = pd.concat([df, df_adx, df_atr], axis=1, join='inner')
     df['adx_rating'] = df.apply(adx_signal, axis=1)
+    df['atr_rating'] = df.apply(atr_signal, axis=1)
     ##########################################normalizing data###########################################################
     df = df.sort_index(ascending=False)
     df['strong_bullish'] = df.apply(strongBullishCandle, axis=1)
