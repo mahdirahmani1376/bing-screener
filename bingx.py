@@ -1,8 +1,9 @@
 import pandas as pd
+import pandas_ta as ta
 from crypto_meter import get_crypto_meter_dataframe
 from helper_functions import *
 from coin_market_cap import get_coin_market_cap_df
-from indicator_filter import adx_signal
+from indicator_functions import adx_signal
 
 with_crypto_meter = False
 
@@ -14,9 +15,6 @@ count_of_strong_close_bars = 6
 
 if with_crypto_meter:
     df_crypto_meter = get_crypto_meter_dataframe()
-
-df_coin_market_cap = get_coin_market_cap_df()
-
 
 async def main(dfAllCurrencies):
     payload = {}
@@ -58,52 +56,73 @@ async def sendAsyncRequest(session, path, urlpa, currencyParams):
 
 ##################################################################################################
 def getCurrencyDataFrame(data, currencyParams):
-    dfCurrency = pd.DataFrame(json.loads(data)['data'])
-    dfCurrency.sort_index(inplace=True, ascending=True)
+    df = pd.DataFrame(json.loads(data)['data'])
     ##########################################normalizing data###########################################################
-    dfCurrency.columns = defaultColumns
-    dfTimeStamp = dfCurrency.copy()
-    dfTimeStamp['symbol'] = currencyParams['symbol']
-    dfTimeStamp['candlestick_chart_close_time'] = dfTimeStamp['candlestick_chart_close_time'].apply(convertToTimeStamp)
-    dfTimeStamp['candlestick_chart_open_time'] = dfTimeStamp['candlestick_chart_open_time'].apply(convertToTimeStamp)
-    dfTimeStamp['volume'] = dfTimeStamp['volume'].apply(lambda x: x / 1000000)
-    dfTimeStamp2 = dfTimeStamp.set_index('candlestick_chart_close_time')
+    df.columns = defaultColumns
+    df['symbol'] = currencyParams['symbol']
+    df['candlestick_chart_close_time'] = df['candlestick_chart_close_time'].apply(convertToTimeStamp)
+    df['candlestick_chart_open_time'] = df['candlestick_chart_open_time'].apply(convertToTimeStamp)
+    df['volume'] = df['volume'].apply(lambda x: x / 1000000)
+    df = df.set_index('candlestick_chart_close_time').sort_index(ascending=True)
+    #############################apllying indicators################################################
+    df_adx = df.ta.adx(high=df['high'], low=df['low'], close=df['close'], length=14)
+    df = pd.concat([df, df_adx], axis=1, join='inner')
+    df['adx_rating'] = df.apply(adx_signal, axis=1)
     ##########################################normalizing data###########################################################
-    dfTimeStamp2['strong_bullish'] = dfTimeStamp2.apply(strongBullishCandle, axis=1)
-    dfTimeStamp2['strong_bearish'] = dfTimeStamp2.apply(strongBerishCandle, axis=1)
-    dfTimeStamp2['symbol'] = currencyParams['symbol']
-    dfvolume = dfTimeStamp2.copy()
-    dfvolume = dfvolume.sort_index(ascending=False)
-    dfvolume['last_day_volume'] = dfvolume['volume'].shift(periods=-1)
-    dfvolume['last_day_open'] = dfvolume['open'].shift(periods=-1)
-    dfvolume['last_day_close'] = dfvolume['close'].shift(periods=-1)
-    dfvolume['last_day_high'] = dfvolume['high'].shift(periods=-1)
-    dfvolume['last_day_low'] = dfvolume['low'].shift(periods=-1)
-    dfvolume['strong_volume'] = dfvolume.apply(lambda x: x['volume'] > 3 * (x['last_day_volume']), axis=1)
-    dfvolume['strong_bullish_signal'] = dfvolume.apply(strongBullishSignal, axis=1)
-    dfvolume['strong_bearish_signal'] = dfvolume.apply(strongBearishSignal, axis=1)
-    dfvolume['strong_ratio'] = dfvolume.apply(strongRatio, axis=1)
-    df_adx = dfCurrency.ta.adx(high=dfvolume['high'], low=dfvolume['low'], close=dfvolume['close'], length=14)
-    dfvolume = pd.concat([dfvolume, df_adx], axis=1, join='inner')
-    dfvolume['adx_rating'] = dfvolume.apply(adx_signal, axis=1)
+    df = df.sort_index(ascending=False)
+    df['strong_bullish'] = df.apply(strongBullishCandle, axis=1)
+    df['strong_bearish'] = df.apply(strongBerishCandle, axis=1)
+    df['symbol'] = currencyParams['symbol']
+    df['last_day_volume'] = df['volume'].shift(periods=-1)
+    df['last_day_open'] = df['open'].shift(periods=-1)
+    df['last_day_close'] = df['close'].shift(periods=-1)
+    df['last_day_high'] = df['high'].shift(periods=-1)
+    df['last_day_low'] = df['low'].shift(periods=-1)
+    df['strong_volume'] = df.apply(lambda x: x['volume'] > 3 * (x['last_day_volume']), axis=1)
+    df['strong_bullish_signal'] = df.apply(strongBullishSignal, axis=1)
+    df['strong_bearish_signal'] = df.apply(strongBearishSignal, axis=1)
+    df['strong_ratio'] = df.apply(strongRatio, axis=1)
+
 
     strongBullishCloseList = []
     strongBearishCloseList = []
-    for index, value in enumerate(dfvolume['close']):
-        bullishValueToAppend = value > dfvolume.iloc[index + 1:index + count_of_strong_close_bars]['close'].max()
-        bearishValueToAppend = value < dfvolume.iloc[index + 1:index + count_of_strong_close_bars]['close'].min()
+    for index, value in enumerate(df['close']):
+        bullishValueToAppend = value > df.iloc[index + 1:index + count_of_strong_close_bars]['close'].max()
+        bearishValueToAppend = value < df.iloc[index + 1:index + count_of_strong_close_bars]['close'].min()
         strongBullishCloseList.append(bullishValueToAppend)
         strongBearishCloseList.append(bearishValueToAppend)
 
-    dfvolume['strong_bullish_close_past_bars_before'] = strongBullishCloseList
-    dfvolume['strong_bearish_close_past_bars_before'] = strongBearishCloseList
+    df['strong_bullish_close_past_bars_before'] = strongBullishCloseList
+    df['strong_bearish_close_past_bars_before'] = strongBearishCloseList
+    ###########################################coin_market_cap#######################################################
+    crypto_meter_data = ""
+    if with_crypto_meter:
+        volume_mcap = round(df[df['symbol'] == df['symbol'].values[0]]['volume_mcap'].values[0], 3)
+        if pd.isna(volume_mcap):
+            crypto_meter_data = f""
+        else:
+            crypto_meter_data = f"_v_{volume_mcap}"
 
-    df_return = dfvolume.iloc[[1][:]]
+    volume_coin_mcap = ""
+    rank = ""
+    volume_coin_mcap_series = df_coin_market_cap[df_coin_market_cap['symbol'] == df['symbol'].values[0]][
+        'volume_mcap'].values
+    if len(volume_coin_mcap_series) > 0:
+        rank = df_coin_market_cap[df_coin_market_cap['symbol'] == df['symbol'].values[0]]['cmc_rank'].values[0]
+        volume_coin_mcap = round(volume_coin_mcap_series[0], 3)
+
+    df['volume_coin_mcap'] = volume_coin_mcap
+    df['crypto_meter_data'] = crypto_meter_data
+    df['rank'] = rank
+    ###########################################coin_marrket_cap#######################################################
+
+
+    df_return = df.iloc[[1][:]]
     df_volume_cmc = pd.merge(left=df_return.reset_index(), right=df_coin_market_cap, left_on='symbol', right_on='symbol',
                              how='left').set_index('candlestick_chart_close_time')
 
-    with pd.ExcelWriter(f"data/{time_frame}/{currencyParams['symbol']}.xlsx") as dfVolumeWriter:
-        dfvolume.to_excel(dfVolumeWriter)
+    with pd.ExcelWriter(f"data/{time_frame}/{currencyParams['symbol']}.xlsx") as dfWriter:
+        df.to_excel(dfWriter)
 
     if with_crypto_meter:
         return pd.merge(df_volume_cmc.reset_index(), df_crypto_meter, how='left', left_on='symbol',
@@ -115,9 +134,15 @@ def getCurrencyDataFrame(data, currencyParams):
 ###################################################################################################################
 
 if __name__ == '__main__':
+    df_coin_market_cap = get_coin_market_cap_df()
     dfAllCurrencies = pd.json_normalize(json.loads(getAllCurrencies())['data']['symbols'])
     ScreenerDf = pd.DataFrame([], columns=defaultColumns, index=['candlestick_chart_close_time'])
-    startTime = datetime.now() - timedelta(days=7)
+    if time_frame == d1_time_frame:
+        startTime = datetime.now() - timedelta(days=30)
+    elif time_frame == h4_time_frame:
+        startTime = datetime.now() - timedelta(days=7)
+    elif time_frame == h1_time_frame:
+        startTime = datetime.now() - timedelta(days=1)
     startTime = int(startTime.timestamp() * 1000)
     results = asyncio.run(main(dfAllCurrencies))
     finalDf = pd.concat(results)
