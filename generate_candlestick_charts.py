@@ -11,7 +11,7 @@ from indicator_filter import adx_signal
 # h1_time_frame = "1h"
 # d1_time_frame = "1d"
 # time_frame = h4_time_frame
-how_many_candles_before = 20
+how_many_candles_before = 6
 volume_mcap = ""
 filepath = ""
 
@@ -28,7 +28,7 @@ for i in tqdm(currencies):
     try:
         filepath = os.path.join(os.path.dirname(__file__), i)
         df = pd.read_excel(filepath)
-        df = pd.read_excel("data//ARK-USDT.xlsx")
+        # df = pd.read_excel("data//ARK-USDT.xlsx")
 
         df.set_index('candlestick_chart_close_time', inplace=True)
 
