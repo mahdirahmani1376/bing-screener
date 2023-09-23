@@ -15,7 +15,7 @@ def atr_signal(row):
         return (row['close'] - row['open']) > (3 * row['ATRr_14'])
     except Exception as e:
         print(e)
-        return 0
+        return False
 
 def sma_10(row):
     if (row['price'] > row['SMA_10']):
