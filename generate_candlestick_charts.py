@@ -34,7 +34,8 @@ for i in tqdm(currencies):
 
         if (
                 (
-                        True in dfFinal['strong_bullish_signal'].values
+                        True in dfFinal['atr_rating'].values
+                        or True in dfFinal['strong_bullish_signal'].values
                         or True in dfFinal['strong_ratio'].values
                 )
                 and (True in dfFinal['strong_bullish_close_past_bars_before'].values)
@@ -46,6 +47,7 @@ for i in tqdm(currencies):
 
         if ((
                 True in dfFinal['strong_bearish_signal'].values
+                or True in dfFinal['atr_rating'].values
                 or True in dfFinal['strong_ratio'].values
         )
                 and (True in dfFinal['strong_bearish_close_past_bars_before'].values)
