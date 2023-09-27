@@ -16,11 +16,11 @@ volume_mcap = ""
 filepath = ""
 
 currencies = glob(f"data/{time_frame}/*.xlsx")
-charts = glob(f"charts/{time_frame}/**/*.png", recursive=True)
-charts = [os.path.join(os.path.dirname(__file__), i) for i in charts]
-for i in charts:
-    if os.path.isfile(i):
-        os.remove(i)
+#charts = glob(f"charts/{time_frame}/**/*.png", recursive=True)
+#charts = [os.path.join(os.path.dirname(__file__), i) for i in charts]
+#for i in charts:
+    #if os.path.isfile(i):
+        #os.remove(i)
 
 df_perpetual = get_perpetual_df()
 now = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
