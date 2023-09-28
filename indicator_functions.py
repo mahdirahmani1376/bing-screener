@@ -7,14 +7,14 @@ def adx_signal(row):
         else:
             return 0
     except Exception as e:
-        print(e)
+        # print(e)
         return 0
 
 def atr_signal(row):
     try:
         return (row['close'] - row['open']) > (3 * row['ATRr_14'])
     except Exception as e:
-        print(e)
+        # print(e)
         return False
 
 def sma_10(row):

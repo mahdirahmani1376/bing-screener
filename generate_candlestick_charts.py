@@ -17,12 +17,13 @@ filepath = ""
 
 currencies = glob(f"data/{time_frame}/*.xlsx")
 charts = glob(f"charts/{time_frame}/**/*.png", recursive=True)
-charts = [os.path.join(os.path.dirname(__file__), i) for i in charts]
-for i in charts:
-    if os.path.isfile(i):
-        os.remove(i)
+# charts = [os.path.join(os.path.dirname(__file__), i) for i in charts]
+# for i in charts:
+#     if os.path.isfile(i):
+#         os.remove(i)
 
 df_perpetual = get_perpetual_df()
+now = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 
 for i in tqdm(currencies):
     try:
@@ -41,7 +42,7 @@ for i in tqdm(currencies):
                 and (True in dfFinal['strong_bullish_close_past_bars_before'].values)
                 and (dfFinal['adx_rating'].values[0] > 0)
         ):
-            savePathBullish = f"charts/{time_frame}/bullish"
+            savePathBullish = f"charts/{time_frame}/bullish/{now}"
             path = getSavePath(savePathBullish,dfFinal)
             saveCandleStickChart(df, path)
 
@@ -54,7 +55,7 @@ for i in tqdm(currencies):
                 and (dfFinal['adx_rating'].values[0] < 0)
         ):
             if dfFinal['symbol'].values[0] in df_perpetual['symbol'].values:
-                savePathBearish = f"charts/{time_frame}/bearish"
+                savePathBearish = f"charts/{time_frame}/bearish/{now}"
                 path = getSavePath(savePathBearish, dfFinal)
                 saveCandleStickChart(df, path)
     except Exception as e:
