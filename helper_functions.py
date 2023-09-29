@@ -170,7 +170,7 @@ def saveCandleStickChart(dataframe,path):
     fig.update_layout(xaxis_rangeslider_visible=False, template="plotly_dark")
 
     # fig.write_image(f"charts/{name}.png")
-    fig.write_image(path)
+    fig.write_image(path,width=1920,height=1080)
 
 def getSavePath(savePath,dfFinal):
     if not os.path.exists(savePath):
