@@ -8,3 +8,5 @@ df.sort_index(inplace=True, ascending=True)
 
 df_atr = df.ta.atr()
 df = pd.concat([df, df_atr], axis=1, join='inner')
+with pd.ExcelWriter('indicator.xlsx') as writer:
+    df.to_excel(writer)
