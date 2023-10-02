@@ -145,6 +145,9 @@ if __name__ == '__main__':
         startTime = datetime.now() - timedelta(days=14)
     elif time_frame == h1_time_frame:
         startTime = datetime.now() - timedelta(days=7)
+    elif time_frame == m_15_time_frame:
+        startTime = datetime.now() - timedelta(days=1)
+        
     startTime = int(startTime.timestamp() * 1000)
     results = asyncio.run(main(dfAllCurrencies))
     finalDf = pd.concat(results)

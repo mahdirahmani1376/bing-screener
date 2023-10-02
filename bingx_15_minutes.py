@@ -1,21 +1,25 @@
-import pandas as pd
-import pandas_ta as ta
 from crypto_meter import get_crypto_meter_dataframe
 from helper_functions import *
 from coin_market_cap import get_coin_market_cap_df
 from indicator_functions import adx_signal,atr_signal
+from bingx_perpetual_list import get_perpetual_df
+from indicator_functions import technical_rating
+import os
+import time
+import pandas as pd
+import pandas_ta as ta
 
 with_crypto_meter = False
 
-# h4_time_frame = "4h"
-# h1_time_frame = "1h"
-# d1_time_frame = "1d"
-# time_frame = d1_time_frame
-count_of_strong_close_bars = 6
+count_of_strong_close_bars = 4
 
 if with_crypto_meter:
     df_crypto_meter = get_crypto_meter_dataframe()
 
+now = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+df_perpetual = get_perpetual_df()
+# if not os.path.exists(f"data/{time_frame}"):
+#     os.makedirs(time_frame)
 async def main(dfAllCurrencies):
     payload = {}
     path = '/openApi/spot/v1/market/kline'
@@ -67,6 +71,14 @@ def getCurrencyDataFrame(data, currencyParams):
     #############################apllying indicators################################################
     df_adx = df.ta.adx(high=df['high'], low=df['low'], close=df['close'], length=14)
     df_atr = df.ta.atr()
+    # df_sma_10 = df.ta.sma(df["close"],10)
+    # df_sma_20 = df.ta.sma(df["close"],20)
+    # df_sma_30 = df.ta.sma(df["close"],30)
+    #
+    # df_ema_10 = df.ta.ema(df["close"],10)
+    # df_ema_20 = df.ta.ema(df["close"],20)
+    # df_ema_30 = df.ta.ema(df["close"],30)
+
     df = pd.concat([df, df_adx, df_atr], axis=1, join='inner')
     df['adx_rating'] = df.apply(adx_signal, axis=1)
     df['atr_rating'] = df.apply(atr_signal, axis=1)
@@ -116,8 +128,20 @@ def getCurrencyDataFrame(data, currencyParams):
     df['volume_coin_mcap'] = volume_coin_mcap
     df['crypto_meter_data'] = crypto_meter_data
     df['rank'] = rank
+
+
     ###########################################coin_marrket_cap#######################################################
 
+    dfFinal = df.iloc[1:4**4*18]
+    # dfFinal = df.iloc[1:8]
+    if final_bullish_signal(dfFinal):
+        savePathBullish = f"charts/{time_frame}/bullish/{now}"
+        path = getSavePath(savePathBullish, dfFinal)
+        saveCandleStickChart(df, path)
+    if final_bearish_signal(dfFinal) and df['symbol'].values[0] in df_perpetual['symbol'].values:
+        savePathBearish = f"charts/{time_frame}/bearish/{now}"
+        path = getSavePath(savePathBearish, dfFinal)
+        saveCandleStickChart(df, path)
 
     df_return = df.iloc[[1][:]]
     df_volume_cmc = pd.merge(left=df_return.reset_index(), right=df_coin_market_cap, left_on='symbol', right_on='symbol',
@@ -136,18 +160,24 @@ def getCurrencyDataFrame(data, currencyParams):
 ###################################################################################################################
 
 if __name__ == '__main__':
-    df_coin_market_cap = get_coin_market_cap_df()
-    dfAllCurrencies = pd.json_normalize(json.loads(getAllCurrencies())['data']['symbols'])
-    ScreenerDf = pd.DataFrame([], columns=defaultColumns, index=['candlestick_chart_close_time'])
-    if time_frame == d1_time_frame:
-        startTime = datetime.now() - timedelta(days=30)
-    elif time_frame == h4_time_frame:
-        startTime = datetime.now() - timedelta(days=14)
-    elif time_frame == h1_time_frame:
-        startTime = datetime.now() - timedelta(days=7)
-    startTime = int(startTime.timestamp() * 1000)
-    results = asyncio.run(main(dfAllCurrencies))
-    finalDf = pd.concat(results)
+    while True:
+        df_coin_market_cap = get_coin_market_cap_df()
+        dfAllCurrencies = pd.json_normalize(json.loads(getAllCurrencies())['data']['symbols'])
+        ScreenerDf = pd.DataFrame([], columns=defaultColumns, index=['candlestick_chart_close_time'])
+        startTime = ""
+        if time_frame == d1_time_frame:
+            startTime = datetime.now() - timedelta(days=30)
+        elif time_frame == h4_time_frame:
+            startTime = datetime.now() - timedelta(days=14)
+        elif time_frame == h1_time_frame:
+            startTime = datetime.now() - timedelta(days=7)
+        elif time_frame == m_15_time_frame:
+            startTime = datetime.now() - timedelta(days=1)
+        startTime = int(startTime.timestamp() * 1000)
+        results = asyncio.run(main(dfAllCurrencies))
+        finalDf = pd.concat(results)
 
-    with pd.ExcelWriter(f"screener_data_{time_frame}.xlsx") as writer:
-        finalDf.to_excel(writer)
+        with pd.ExcelWriter(f"screener_data_{time_frame}_{now}.xlsx") as writer:
+            finalDf.to_excel(writer)
+
+        time.sleep(15 * 60)

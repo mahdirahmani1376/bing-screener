@@ -1,9 +1,6 @@
 import pandas as pd
 import pandas_ta as ta
 
-
-
-
 df = pd.read_excel("test.xlsx")
 df.set_index(pd.DatetimeIndex(df["candlestick_chart_close_time"]), inplace=True)
 # df.set_index('candlestick_chart_close_time', inplace=True)
@@ -37,8 +34,7 @@ if __name__ == '__main__':
 
     df.ta.strategy(MyStrategy)
 
-    help(ta.ao)
     # help(ta.xsignals)
+
     # df.ta.strategy(verbose=True)
     # df.ta.strategy(timed=True)
-    df.index.dtype
