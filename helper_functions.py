@@ -131,7 +131,7 @@ def showCandleStickChart(dataframe):
 
 def strongBullishSignalBar(row):
     return strongBullishSignal(row) and (row['last_day_close'] - row['last_day_close'] * 0.05) < row['open'] < (
-                row['last_day_close'] + row['last_day_close'] * 0.05)
+            row['last_day_close'] + row['last_day_close'] * 0.05)
 
 
 def openBelowLastDayClose(row):
@@ -163,17 +163,20 @@ def strongCloseCandle(row):
 
 
 def strongBullishCandle(row):
-    return (row['close'] >= row['high'] * 0.99) and (row['close'] > row['open'])
+    try:
+        return (row['close'] >= row['high'] * 0.99) and (row['close'] > row['open'])
+    except:
+        return (row['close'][0] >= row['high'][0] * 0.99) and (row['close'][0] > row['open'][0])
 
 
 def spikeBullishCandle(row):
     return row['close'] > row['last_day_low'] + 3 * (row['last_day_close'] - row['last_day_low']) and row['close'] > (
-    row['last_day_high'])
+        row['last_day_high'])
 
 
 def spikeBearishCandle(row):
     return row['close'] < row['last_day_high'] - 3 * (row['last_day_close'] - row['last_day_high']) and row['close'] < (
-    row['last_day_high'])
+        row['last_day_high'])
 
 
 def strongBerishCandle(row):
@@ -212,7 +215,8 @@ def final_bullish_signal(df):
             and True in df['strong_ratio'].values
             and True in df['strong_bullish_close_past_bars_before'].values
             and df['adx_rating'].values[0] > 0
-            )
+    )
+
 
 def final_bearish_signal(df):
     return (
@@ -221,7 +225,7 @@ def final_bearish_signal(df):
             and True in df['strong_ratio'].values
             and True in df['strong_bearish_close_past_bars_before'].values
             and df['adx_rating'].values[0] < 0
-            )
+    )
 
 
 def getSavePath(savePath, dfFinal):

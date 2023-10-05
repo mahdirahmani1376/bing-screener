@@ -1,3 +1,5 @@
+import os
+
 import pandas as pd
 import pandas_ta as ta
 from crypto_meter import get_crypto_meter_dataframe
@@ -7,7 +9,7 @@ from indicator_functions import adx_signal,atr_signal
 
 with_crypto_meter = False
 
-count_of_strong_close_bars = 2
+count_of_strong_close_bars = 4
 
 if with_crypto_meter:
     df_crypto_meter = get_crypto_meter_dataframe()
@@ -61,11 +63,11 @@ def getCurrencyDataFrame(data, currencyParams):
     df['volume'] = df['volume'].apply(lambda x: x / 1000000)
     df = df.set_index('candlestick_chart_close_time').sort_index(ascending=True)
     #############################apllying indicators################################################
-    df_adx = df.ta.adx(high=df['high'], low=df['low'], close=df['close'], length=14)
-    df_atr = df.ta.atr()
-    df = pd.concat([df, df_adx, df_atr], axis=1, join='inner')
-    df['adx_rating'] = df.apply(adx_signal, axis=1)
-    df['atr_rating'] = df.apply(atr_signal, axis=1)
+    # df_adx = df.ta.adx(high=df['high'], low=df['low'], close=df['close'], length=14)
+    # df_atr = df.ta.atr()
+    # df = pd.concat([df, df_adx, df_atr], axis=1, join='inner')
+    # df['adx_rating'] = df.apply(adx_signal, axis=1)
+    # df['atr_rating'] = df.apply(atr_signal, axis=1)
     ##########################################normalizing data###########################################################
     df = df.sort_index(ascending=False)
     df['strong_bullish'] = df.apply(strongBullishCandle, axis=1)
@@ -119,7 +121,10 @@ def getCurrencyDataFrame(data, currencyParams):
     df_volume_cmc = pd.merge(left=df_return.reset_index(), right=df_coin_market_cap, left_on='symbol', right_on='symbol',
                              how='left').set_index('candlestick_chart_close_time')
 
-    with pd.ExcelWriter(f"data/{time_frame}/{currencyParams['symbol']}.xlsx") as dfWriter:
+    df_save_dir = f"data/{time_frame}"
+    if not os.path.exists(df_save_dir):
+        os.makedirs(df_save_dir)
+    with pd.ExcelWriter(f"{df_save_dir}/{currencyParams['symbol']}.xlsx") as dfWriter:
         df.to_excel(dfWriter)
 
     if with_crypto_meter:
@@ -143,6 +148,8 @@ if __name__ == '__main__':
         startTime = datetime.now() - timedelta(days=7)
     elif time_frame == m_15_time_frame:
         startTime = datetime.now() - timedelta(days=1)
+    else:
+        startTime = datetime.now() - timedelta(days=120)
         
     startTime = int(startTime.timestamp() * 1000)
     results = asyncio.run(main(dfAllCurrencies))

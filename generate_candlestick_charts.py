@@ -7,7 +7,7 @@ from tqdm import tqdm
 from bingx_perpetual_list import get_perpetual_df
 # from indicator_filter import adx_signal
 
-how_many_candles_before = 5
+how_many_candles_before = 8
 volume_mcap = ""
 filepath = ""
 
@@ -31,12 +31,12 @@ for i in tqdm(currencies):
 
         if (
                 (
-                        True in dfFinal['atr_rating'].values
-                        or True in dfFinal['strong_bullish_signal'].values
+                        # True in dfFinal['atr_rating'].values
+                        True in dfFinal['strong_bullish_signal'].values
                         or True in dfFinal['strong_ratio'].values
                 )
                 and (True in dfFinal['strong_bullish_close_past_bars_before'].values)
-                and (dfFinal['adx_rating'].values[0] > 0)
+                # and (dfFinal['adx_rating'].values[0] > 0)
         ):
             savePathBullish = f"charts/{time_frame}/bullish/{now}"
             path = getSavePath(savePathBullish,dfFinal)
@@ -44,11 +44,11 @@ for i in tqdm(currencies):
 
         if ((
                 True in dfFinal['strong_bearish_signal'].values
-                or True in dfFinal['atr_rating'].values
+                # or True in dfFinal['atr_rating'].values
                 or True in dfFinal['strong_ratio'].values
         )
                 and (True in dfFinal['strong_bearish_close_past_bars_before'].values)
-                and (dfFinal['adx_rating'].values[0] < 0)
+                # and (dfFinal['adx_rating'].values[0] < 0)
         ):
             if dfFinal['symbol'].values[0] in df_perpetual['symbol'].values:
                 savePathBearish = f"charts/{time_frame}/bearish/{now}"
