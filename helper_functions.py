@@ -15,11 +15,12 @@ import aiohttp
 import asyncio
 from aiolimiter import AsyncLimiter
 
+weekly_time_frame = "1w"
 h4_time_frame = "4h"
 h1_time_frame = "1h"
 d1_time_frame = "1d"
 m_15_time_frame = '15m'
-time_frame = m_15_time_frame
+time_frame = weekly_time_frame
 
 with open('credentials.json') as file:
     jsonFile = json.load(file)

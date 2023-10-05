@@ -7,11 +7,7 @@ from indicator_functions import adx_signal,atr_signal
 
 with_crypto_meter = False
 
-# h4_time_frame = "4h"
-# h1_time_frame = "1h"
-# d1_time_frame = "1d"
-# time_frame = d1_time_frame
-count_of_strong_close_bars = 6
+count_of_strong_close_bars = 2
 
 if with_crypto_meter:
     df_crypto_meter = get_crypto_meter_dataframe()
@@ -152,5 +148,5 @@ if __name__ == '__main__':
     results = asyncio.run(main(dfAllCurrencies))
     finalDf = pd.concat(results)
 
-    with pd.ExcelWriter(f"screener_data_{time_frame}.xlsx") as writer:
+    with pd.ExcelWriter(f"data/screener_data_{time_frame}.xlsx") as writer:
         finalDf.to_excel(writer)

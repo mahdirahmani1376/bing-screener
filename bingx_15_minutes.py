@@ -177,7 +177,7 @@ if __name__ == '__main__':
         results = asyncio.run(main(dfAllCurrencies))
         finalDf = pd.concat(results)
 
-        with pd.ExcelWriter(f"screener_data_{time_frame}_{now}.xlsx") as writer:
+        with pd.ExcelWriter(f"data/screener_data_{time_frame}_{now}.xlsx") as writer:
             finalDf.to_excel(writer)
 
         time.sleep(15 * 60)
