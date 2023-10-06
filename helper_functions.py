@@ -30,7 +30,7 @@ with open('credentials.json') as file:
 APIURL = "https://open-api.bingx.com"
 timeStampFormat = '%Y-%m-%d %H:%M:%S'
 
-MAX_CONCURRENT = 8
+MAX_CONCURRENT = 16
 RATE_LIMIT_IN_SECOND = 16
 limiter = AsyncLimiter(RATE_LIMIT_IN_SECOND, 1.0)
 
@@ -55,6 +55,13 @@ defaultColumns = [
 
 # serverRawTime = json.loads(getServerTime())["timestamp"]
 # currentServerTime = convertToTimeStamp(serverRawTime)
+def calculate_percent_change(df,target,close_column_loc):
+    if target not in range(len(df.index)):
+        return False
+
+    now = df.iloc[0, close_column_loc]
+    target = df.iloc[target, close_column_loc]
+    return ((now - target) / target) * 100
 
 def convertToTimeStamp(x):
     timeoftest = datetime.utcfromtimestamp(float(x / 1000))
