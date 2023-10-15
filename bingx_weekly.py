@@ -2,20 +2,15 @@ import os
 
 import pandas as pd
 import pandas_ta as ta
-from crypto_meter import get_crypto_meter_dataframe
 from helper_functions import *
 from coin_market_cap import get_coin_market_cap_df
 from indicator_functions import adx_signal, atr_signal
 
 pd.options.mode.chained_assignment = None  # default='warn'
 
-with_crypto_meter = False
+now = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 
 count_of_strong_close_bars = 4
-
-if with_crypto_meter:
-    df_crypto_meter = get_crypto_meter_dataframe()
-
 
 async def main(dfAllCurrencies):
     payload = {}
@@ -90,14 +85,6 @@ def getCurrencyDataFrame(data, currencyParams):
     df['strong_bullish_close_past_bars_before'] = strongBullishCloseList
     df['strong_bearish_close_past_bars_before'] = strongBearishCloseList
     ###########################################coin_market_cap#######################################################
-    crypto_meter_data = ""
-    if with_crypto_meter:
-        volume_mcap = round(df[df['symbol'] == df['symbol'].values[0]]['volume_mcap'].values[0], 3)
-        if pd.isna(volume_mcap):
-            crypto_meter_data = f""
-        else:
-            crypto_meter_data = f"_v_{volume_mcap}"
-
     volume_coin_mcap = ""
     rank = ""
     volume_coin_mcap_series = df_coin_market_cap[df_coin_market_cap['symbol'] == df['symbol'].values[0]][
@@ -107,7 +94,6 @@ def getCurrencyDataFrame(data, currencyParams):
         volume_coin_mcap = round(volume_coin_mcap_series[0], 3)
 
     df['volume_coin_mcap'] = volume_coin_mcap
-    df['crypto_meter_data'] = crypto_meter_data
     df['rank'] = rank
     ###########################################calculate_percent_changes###########################################
     close_column_loc = df.columns.get_loc('close')
@@ -132,14 +118,16 @@ def getCurrencyDataFrame(data, currencyParams):
     df_save_dir = f"data/{time_frame}"
     if not os.path.exists(df_save_dir):
         os.makedirs(df_save_dir)
+
+
     with pd.ExcelWriter(f"{df_save_dir}/{currencyParams['symbol']}.xlsx") as dfWriter:
         df.to_excel(dfWriter)
 
-    if with_crypto_meter:
-        return pd.merge(df_volume_cmc.reset_index(), df_crypto_meter, how='left', left_on='symbol',
-                        right_on='name').set_index('candlestick_chart_close_time')
-    else:
-        return df_volume_cmc
+    savePathBullish = f"charts/{time_frame}/all/{now}"
+    path = getSavePath(savePathBullish, df)
+    saveCandleStickChart(df, path)
+
+    return df_volume_cmc
 
 
 ###################################################################################################################
