@@ -45,7 +45,7 @@ json_data = {
     'sortModel': [
         {
             'sort': 'desc',
-            'colId': 'fees_30d_sum',
+            'colId': 'tvl_7d_change',
         },
     ],
 }
@@ -60,5 +60,5 @@ response = requests.post(
 json_response = response.json()
 df = pd.json_normalize(json_response['data'])
 #%%
-with pd.ExcelWriter('data/token_terminal.xlsx') as writer:
-    df.to_excel(writer)
+# with pd.ExcelWriter('data/token_terminal.xlsx') as writer:
+#     df.to_excel(writer)
