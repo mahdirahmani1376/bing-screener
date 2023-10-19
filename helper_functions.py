@@ -239,5 +239,6 @@ def getSavePath(savePath, dfFinal):
     if not os.path.exists(savePath):
         os.makedirs(savePath)
     return os.path.join(savePath,
-                        f"{dfFinal['symbol'].values[0]}_cm_{dfFinal['crypto_meter_data'].values[0]}_cmc_"
+                        # f"{dfFinal['symbol'].values[0]}_cm_{dfFinal['crypto_meter_data'].values[0]}_cmc_"
+                        f"{dfFinal['symbol'].values[0]}_cmc_"
                         f"{dfFinal['volume_coin_mcap'].values[0]}_rank{dfFinal['rank'].values[0]}.png")
