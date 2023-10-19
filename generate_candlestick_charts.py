@@ -7,7 +7,7 @@ from tqdm import tqdm
 from bingx_perpetual_list import get_perpetual_df
 # from indicator_filter import adx_signal
 
-how_many_candles_before = 2
+how_many_candles_before = 4
 volume_mcap = ""
 filepath = ""
 

@@ -9,7 +9,7 @@ from indicator_functions import adx_signal,atr_signal
 
 with_crypto_meter = False
 
-count_of_strong_close_bars = 4
+count_of_strong_close_bars = 20
 
 if with_crypto_meter:
     df_crypto_meter = get_crypto_meter_dataframe()
@@ -148,6 +148,8 @@ if __name__ == '__main__':
         startTime = datetime.now() - timedelta(days=7)
     elif time_frame == m_15_time_frame:
         startTime = datetime.now() - timedelta(days=1)
+    elif time_frame == weekly_time_frame:
+        startTime = datetime.now() - timedelta(days=180)
     else:
         startTime = datetime.now() - timedelta(days=120)
         
