@@ -141,4 +141,4 @@ for i in df_list:
     df_token_terminal = pd.concat([df_token_terminal,i])
 df_token_terminal = df_token_terminal[columns]
 with pd.ExcelWriter('data/token_terminal.xlsx') as writer:
-    df.to_excel(writer)
+    df_token_terminal.to_excel(writer)
