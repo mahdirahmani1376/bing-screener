@@ -9,7 +9,7 @@ from indicator_functions import adx_signal,atr_signal
 
 with_crypto_meter = False
 
-count_of_strong_close_bars = 4
+count_of_strong_close_bars = 20
 
 if with_crypto_meter:
     df_crypto_meter = get_crypto_meter_dataframe()
