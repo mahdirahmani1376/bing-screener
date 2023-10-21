@@ -148,6 +148,8 @@ if __name__ == '__main__':
         startTime = datetime.now() - timedelta(days=7)
     elif time_frame == m_15_time_frame:
         startTime = datetime.now() - timedelta(days=1)
+    elif time_frame == weekly_time_frame:
+        startTime = datetime.now() - timedelta(days=180)
     else:
         startTime = datetime.now() - timedelta(days=120)
         
