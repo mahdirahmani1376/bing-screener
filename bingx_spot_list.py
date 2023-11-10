@@ -41,5 +41,5 @@ def praseParam(paramsMap):
 
 def get_spot_df():
     response = json.loads(demo())
-    return pd.DataFrame(response['data'])
+    return pd.DataFrame(response['data']['symbols'])
 
