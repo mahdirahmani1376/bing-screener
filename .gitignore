@@ -11,3 +11,6 @@ data/*/*
 /.venv/
 /wsl$Ubuntuhomemahdipersonal/
 /data/*
+*.png
+*.jpg
+*.jpeg
