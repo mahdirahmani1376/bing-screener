@@ -11,30 +11,24 @@ cookies = {
     'intercom-device-id-p3bihfmm': 'b6a13925-5e1b-4abb-89f9-226ef0cdcad9',
     '__stripe_mid': 'be998070-b8ce-49f7-a7b4-cde46e5fe1a29b1265',
     'session': 'b312073b-9da1-4230-91fa-c407c2771140',
-    '_loggedin': '1',
     '_ga': 'GA1.1.1353671698.1697708757',
     'intercom-session-p3bihfmm': '',
-    '__stripe_sid': '2f4ee364-393c-4359-b6a1-8a1f23a68a79df8610',
-    '_ga_TJ9TEYJ3GF': 'GS1.1.1699615120.14.1.1699615257.0.0.0',
-    'ph_phc_amGyrGA1TpwJYYk2zNff9qfQkFBzu4uFghOgP6DjqIj_posthog': '%7B%22distinct_id%22%3A%22018b8f9d-82d0-7998-a9be-72eb8c3bad4f%22%2C%22%24device_id%22%3A%22018b8f9d-82d0-7998-a9be-72eb8c3bad4f%22%2C%22%24user_state%22%3A%22anonymous%22%2C%22%24sesid%22%3A%5B1699615257451%2C%22018bb8f4-a124-758d-a15c-5c7d5bc845f9%22%2C1699615121700%5D%2C%22%24client_session_props%22%3A%7B%22sessionId%22%3A%22018bb8f4-a124-758d-a15c-5c7d5bc845f9%22%2C%22props%22%3A%7B%22initialPathName%22%3A%22%2Fterminal%2Fcrypto-screener%22%2C%22referringDomain%22%3A%22%24direct%22%7D%7D%2C%22%24session_recording_enabled_server_side%22%3Afalse%2C%22%24autocapture_disabled_server_side%22%3Atrue%2C%22%24active_feature_flags%22%3A%5B%5D%2C%22%24enabled_feature_flags%22%3A%7B%7D%2C%22%24feature_flag_payloads%22%3A%7B%7D%7D',
+    'ph_phc_amGyrGA1TpwJYYk2zNff9qfQkFBzu4uFghOgP6DjqIj_posthog': '%7B%22distinct_id%22%3A%22018b8f9d-82d0-7998-a9be-72eb8c3bad4f%22%2C%22%24device_id%22%3A%22018b8f9d-82d0-7998-a9be-72eb8c3bad4f%22%2C%22%24user_state%22%3A%22anonymous%22%2C%22%24sesid%22%3A%5B1699625507213%2C%22018bb993-198d-705e-b506-efb1d3eab032%22%2C1699625507213%5D%2C%22%24client_session_props%22%3A%7B%22sessionId%22%3A%22018bb993-198d-705e-b506-efb1d3eab032%22%2C%22props%22%3A%7B%22initialPathName%22%3A%22%2Fterminal%2Fcrypto-screener%22%2C%22referringDomain%22%3A%22%24direct%22%7D%7D%2C%22%24session_recording_enabled_server_side%22%3Afalse%2C%22%24autocapture_disabled_server_side%22%3Atrue%2C%22%24active_feature_flags%22%3A%5B%5D%2C%22%24enabled_feature_flags%22%3A%7B%7D%2C%22%24feature_flag_payloads%22%3A%7B%7D%7D',
+    '__stripe_sid': '64f9f93c-bc8b-40e5-9abb-82080de54cce36442c',
+    '_ga_TJ9TEYJ3GF': 'GS1.1.1700214255.18.1.1700214301.0.0.0',
 }
 
 headers = {
-    'authority': 'api.tokenterminal.com',
-    'accept': '*/*',
-    'accept-language': 'en-GB,en;q=0.9,en-US;q=0.8,fa;q=0.7',
-    'if-none-match': 'W/"70217-/J8dzJOl3WJdwfp/m3hxj52jRb8"',
-    'origin': 'https://tokenterminal.com',
-    'referer': 'https://tokenterminal.com/',
-    'sec-ch-ua': '"Chromium";v="118", "Google Chrome";v="118", "Not=A?Brand";v="99"',
+    'x-tt-terminal-jwt': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcm9udEVuZCI6InRlcm1pbmFsIGRhc2hib2FyZCIsImlhdCI6MTcwMDE4MDUwOCwiZXhwIjoxNzAxMzkwMTA4fQ.W0K1Vr27UC5xprjeARrCEHgT5KAnh33LO52mqNnXihI',
+    'sec-ch-ua': '"Google Chrome";v="119", "Chromium";v="119", "Not?A_Brand";v="24"',
+    'Referer': 'https://tokenterminal.com/',
     'sec-ch-ua-mobile': '?0',
+    'authorization': 'Bearer c0e5035a-64f6-4d2c-b5f6-ac1d1cb3da2f',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
     'sec-ch-ua-platform': '"Windows"',
-    'sec-fetch-dest': 'empty',
-    'sec-fetch-mode': 'cors',
-    'sec-fetch-site': 'same-site',
-    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36',
-    'x-tt-terminal-jwt': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcm9udEVuZCI6InRlcm1pbmFsIGRhc2hib2FyZCIsImlhdCI6MTY5OTYwOTY0NSwiZXhwIjoxNzAwODE5MjQ1fQ.UJtp19dbJnughbPCH7X_ERmsfkGlaABvi1uFLwQ5OQc',
 }
+
+
 
 df_list = []
 for i in tqdm(range(0,3)):
@@ -115,18 +109,18 @@ columns = [
 "pf_fully_diluted_90d_change",
 "pf_fully_diluted_180d_change",
 "pf_fully_diluted_365d_change",
-"pf_fully_diluted_24h_trend",
-"pf_fully_diluted_7d_trend",
-"pf_fully_diluted_30d_trend",
-"pf_fully_diluted_90d_trend",
-"pf_fully_diluted_180d_trend",
-"pf_fully_diluted_365d_trend",
+# "pf_fully_diluted_24h_trend",
+# "pf_fully_diluted_7d_trend",
+# "pf_fully_diluted_30d_trend",
+# "pf_fully_diluted_90d_trend",
+# "pf_fully_diluted_180d_trend",
+# "pf_fully_diluted_365d_trend",
 # "ps_fully_diluted_7d_change",
 # "ps_fully_diluted_30d_change",
 # "ps_fully_diluted_90d_change",
 # "ps_fully_diluted_180d_change",
 # "ps_fully_diluted_365d_change",
-# "market_cap_fully_diluted_max_latest",
+"market_cap_fully_diluted_max_latest",
 ]
 df_token_terminal = pd.DataFrame()
 for i in df_list:

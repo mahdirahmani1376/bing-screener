@@ -15,14 +15,12 @@ headers = {
 symbols_url = 'https://api.binance.com/api/v3/exchangeInfo'
 
 response_binance_list = requests.get(symbols_url, headers=headers).json()
-df_binance_symbols = pd.DataFrame(response_binance_list['symbols'])['symbol'].values.tolist()
-df_bingx_list = get_spot_df()
-df_bingx_list['binance_symbol'] = df_bingx_list['symbol'].apply(lambda x: x.replace('-', ''))
-df_bingx_list['binance_btc_symbol'] = df_bingx_list['symbol'].apply(lambda x: x.split('-')[0] + 'BTC')
-df_joined = df_bingx_list[df_bingx_list['binance_symbol'].isin(df_binance_symbols)]
-sample_symbol = df_joined.loc[49:50]
+df_binance = pd.DataFrame(response_binance_list['symbols'])
 
-binance_symbol_url = f"https://api.binance.com/api/v3/klines?symbol={sample_symbol.at[0, 'binance_symbol']}&interval=4h"
+sample_symbol_btc = df_binance.iloc[0, 0]
+smaple_symbol_usdt = 'ETHUSDT'
+# %%
+binance_symbol_url = f"https://api.binance.com/api/v3/klines?symbol={smaple_symbol_usdt}&interval=4h"
 binance_symbol_data = requests.get(binance_symbol_url, headers=headers).json()
 columns = [
     "candlestick_chart_open_time",
@@ -40,18 +38,19 @@ columns = [
 ]
 df_binance_symbol = pd.DataFrame(binance_symbol_data)
 df_binance_symbol.columns = columns
-df_binance_symbol['symbol'] = sample_symbol.at[0, 'binance_symbol']
+df_binance_symbol['symbol'] = smaple_symbol_usdt
 df_binance_symbol['candlestick_chart_close_time'] = df_binance_symbol['candlestick_chart_close_time'].apply(
     convertToTimeStamp)
 df_binance_symbol['candlestick_chart_open_time'] = df_binance_symbol['candlestick_chart_open_time'].apply(
     convertToTimeStamp)
 df_binance_symbol = df_binance_symbol.set_index('candlestick_chart_close_time').sort_index(ascending=True)
 # %%
-binance_symbol_url_btc = f"https://api.binance.com/api/v3/klines?symbol={sample_symbol.at[0, 'binance_btc_symbol']}&interval=4h"
-binance_symbol_data_btc = requests.get(binance_symbol_url, headers=headers).json()
+binance_symbol_url_btc = f"https://api.binance.com/api/v3/klines?symbol={sample_symbol_btc}&interval=4h"
+# binance_symbol_url_btc = f"https://api.binance.com/api/v3/klines?symbol=ETHBTC&interval=4h"
+binance_symbol_data_btc = requests.get(binance_symbol_url_btc, headers=headers).json()
 df_binance_symbol_btc = pd.DataFrame(binance_symbol_data_btc)
 df_binance_symbol_btc.columns = columns
-df_binance_symbol_btc['symbol'] = sample_symbol.at[0, 'binance_btc_symbol']
+df_binance_symbol_btc['symbol'] = sample_symbol_btc
 df_binance_symbol_btc['candlestick_chart_close_time'] = df_binance_symbol_btc['candlestick_chart_close_time'].apply(
     convertToTimeStamp)
 df_binance_symbol_btc['candlestick_chart_open_time'] = df_binance_symbol_btc['candlestick_chart_open_time'].apply(
@@ -61,29 +60,39 @@ df_binance_symbol_btc = df_binance_symbol_btc.set_index('candlestick_chart_close
 fig = make_subplots(rows=2, cols=1,
                     shared_xaxes=True,
                     vertical_spacing=0.02)
-layout = go.Layout(autosize=True)
+
+# layout = go.Layout(autosize=True)
 candlestick = go.Candlestick(
     x=df_binance_symbol.index,
     open=df_binance_symbol['open'],
     high=df_binance_symbol['high'],
     low=df_binance_symbol['low'],
-    close=df_binance_symbol['close']
+    close=df_binance_symbol['close'],
+    name='usdt'
 )
 candlestick_btc = go.Candlestick(
     x=df_binance_symbol_btc.index,
     open=df_binance_symbol_btc['open'],
     high=df_binance_symbol_btc['high'],
     low=df_binance_symbol_btc['low'],
-    close=df_binance_symbol_btc['close']
+    close=df_binance_symbol_btc['close'],
+    name='btc',
 )
 
-fig = go.Figure(data=[
-    candlestick,
-    candlestick_btc
-],
-    # layout=layout,
+# fig = go.Figure(data=[
+#     candlestick,
+#     candlestick_btc
+# ],
+# layout=layout,
+# )
+fig.add_trace(candlestick, row=1, col=1)
+fig.add_trace(candlestick_btc, row=2, col=1)
+fig.update_layout(
+    # xaxis_rangeslider_visible=False,
+    template="plotly_dark",
+    autosize=True
 )
-fig.update_layout(xaxis_rangeslider_visible=False, template="plotly_dark")
+fig.update_xaxes(rangeslider_visible=False)
 
 path = "test_all.png"
 fig.write_image(path, width=1920, height=1080)
