@@ -1,5 +1,4 @@
 import os
-
 import pandas as pd
 import pandas_ta as ta
 from crypto_meter import get_crypto_meter_dataframe

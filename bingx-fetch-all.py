@@ -20,7 +20,8 @@ df_binance = pd.DataFrame(response_binance_list['symbols'])
 sample_symbol_btc = df_binance.iloc[0, 0]
 smaple_symbol_usdt = 'ETHUSDT'
 # %%
-binance_symbol_url = f"https://api.binance.com/api/v3/klines?symbol={smaple_symbol_usdt}&interval=4h"
+# binance_symbol_url = f"https://api.binance.com/api/v3/klines?symbol={smaple_symbol_usdt}&interval=4h"
+binance_symbol_url = f"https://api.binance.com/api/v3/klines?symbol=NEOUSDT&interval=1w"
 binance_symbol_data = requests.get(binance_symbol_url, headers=headers).json()
 columns = [
     "candlestick_chart_open_time",
@@ -45,8 +46,8 @@ df_binance_symbol['candlestick_chart_open_time'] = df_binance_symbol['candlestic
     convertToTimeStamp)
 df_binance_symbol = df_binance_symbol.set_index('candlestick_chart_close_time').sort_index(ascending=True)
 # %%
-binance_symbol_url_btc = f"https://api.binance.com/api/v3/klines?symbol={sample_symbol_btc}&interval=4h"
-# binance_symbol_url_btc = f"https://api.binance.com/api/v3/klines?symbol=ETHBTC&interval=4h"
+# binance_symbol_url_btc = f"https://api.binance.com/api/v3/klines?symbol={sample_symbol_btc}&interval=4h"
+binance_symbol_url_btc = f"https://api.binance.com/api/v3/klines?symbol=NEOBTC&interval=1w"
 binance_symbol_data_btc = requests.get(binance_symbol_url_btc, headers=headers).json()
 df_binance_symbol_btc = pd.DataFrame(binance_symbol_data_btc)
 df_binance_symbol_btc.columns = columns
@@ -68,7 +69,7 @@ candlestick = go.Candlestick(
     high=df_binance_symbol['high'],
     low=df_binance_symbol['low'],
     close=df_binance_symbol['close'],
-    name='usdt'
+    name='usdt',
 )
 candlestick_btc = go.Candlestick(
     x=df_binance_symbol_btc.index,
@@ -93,6 +94,6 @@ fig.update_layout(
     autosize=True
 )
 fig.update_xaxes(rangeslider_visible=False)
-
-path = "test_all.png"
+fig.update_yaxes(type='log')
+path = "test_all_linear.png"
 fig.write_image(path, width=1920, height=1080)

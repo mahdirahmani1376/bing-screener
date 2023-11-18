@@ -22,7 +22,8 @@ df_bingx_list['binance_btc_symbol'] = df_bingx_list['symbol'].apply(lambda x: x.
 df_joined = df_bingx_list[df_bingx_list['binance_symbol'].isin(df_binance_symbols)]
 sample_symbol = df_joined.loc[49:50]
 
-binance_symbol_url = f"https://api.binance.com/api/v3/klines?symbol={sample_symbol.at[0, 'binance_symbol']}&interval=4h"
+# binance_symbol_url = f"https://api.binance.com/api/v3/klines?symbol={sample_symbol.at[0, 'binance_symbol']}&interval=4h"
+binance_symbol_url = f"https://api.binance.com/api/v3/klines?symbol=NEOUSDT&interval=4h"
 binance_symbol_data = requests.get(binance_symbol_url, headers=headers).json()
 columns = [
     "candlestick_chart_open_time",
@@ -47,7 +48,8 @@ df_binance_symbol['candlestick_chart_open_time'] = df_binance_symbol['candlestic
     convertToTimeStamp)
 df_binance_symbol = df_binance_symbol.set_index('candlestick_chart_close_time').sort_index(ascending=True)
 # %%
-binance_symbol_url_btc = f"https://api.binance.com/api/v3/klines?symbol={sample_symbol.at[0, 'binance_btc_symbol']}&interval=4h"
+# binance_symbol_url_btc = f"https://api.binance.com/api/v3/klines?symbol={sample_symbol.at[0, 'binance_btc_symbol']}&interval=4h"
+binance_symbol_url_btc = f"https://api.binance.com/api/v3/klines?symbol=NEOUSDT&interval=4h"
 binance_symbol_data_btc = requests.get(binance_symbol_url, headers=headers).json()
 df_binance_symbol_btc = pd.DataFrame(binance_symbol_data_btc)
 df_binance_symbol_btc.columns = columns
