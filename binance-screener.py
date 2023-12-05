@@ -26,12 +26,13 @@ headers = {
 }
 symbols_url = 'https://api.binance.com/api/v3/exchangeInfo'
 
+monthly_time_frame = "1m"
 weekly_time_frame = "1w"
 h4_time_frame = "4h"
 h1_time_frame = "1h"
 d1_time_frame = "1d"
 m_15_time_frame = '15m'
-time_frame = h4_time_frame
+time_frame = weekly_time_frame
 
 response_binance_list = requests.get(symbols_url, headers=headers).json()
 df_binance = pd.DataFrame(response_binance_list['symbols'])
