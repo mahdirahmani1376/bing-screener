@@ -32,9 +32,9 @@ h4_time_frame = "4h"
 h1_time_frame = "1h"
 d1_time_frame = "1d"
 m_15_time_frame = '15m'
-time_frame = h4_time_frame
+time_frame = weekly_time_frame
 
-df_binance_pairs = pd.read_csv('MyReport_www.gocharting.com.csv')
+df_binance_pairs = pd.read_csv('week.csv')
 
 def generate_sub_plot(df_usdt, df_btc, file_name):
     fig = make_subplots(rows=2, cols=1,
