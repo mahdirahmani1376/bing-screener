@@ -32,7 +32,7 @@ h4_time_frame = "4h"
 h1_time_frame = "1h"
 d1_time_frame = "1d"
 m_15_time_frame = '15m'
-time_frame = monthly_time_frame
+time_frame = d1_time_frame
 
 response_binance_list = requests.get(symbols_url, headers=headers).json()
 df_binance = pd.DataFrame(response_binance_list['symbols'])
@@ -43,6 +43,8 @@ df_binance_pairs = df_binance_pairs[df_binance_pairs['baseAsset'] != 'TUSD']
 
 
 def generate_sub_plot(df_usdt, df_btc, file_name):
+    df_usdt = df_usdt.iloc[-90:]
+    df_btc = df_btc.iloc[-90:]
     fig = make_subplots(rows=2, cols=1,
                         shared_xaxes=True,
                         vertical_spacing=0.02)

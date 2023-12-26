@@ -1,33 +1,38 @@
 import pandas as pd
 import requests
+from coin_market_cap import get_coin_market_cap_df
+
 def get_crypto_meter_dataframe():
     cookies = {
+        '_ga': 'GA1.1.928168899.1703515594',
         'cookieControl': 'true',
         'cookieControlPrefs': '%5B%22preferences%22%2C%22analytics%22%2C%22marketing%22%5D',
-        '__gads': 'ID=1213e9598e6dbafa:T=1671607514:S=ALNI_Mbyse-h16WjM-9LMv17A0D4TxqIdg',
-        '__gpi': 'UID=00000b95a50719b8:T=1671607514:RT=1671607514:S=ALNI_MamwSzR590dczzjUMRCHhpxsIPJYQ',
-        'cto_bundle': 'DFRgfl9yWEV6N0ZCaU5LNkFveSUyQkpPT05qJTJCRm1VVDltTlhoWHdrRnFUOGRvJTJGRlpMamJXZEolMkY1SUlINktFS2I1QWhUandjZktqYjR0NmJWNlA4ZXc4OCUyQndvTjBUcXJFc0x6bnZHRXZXSllXUWpVWW5IbUtlZXNoWTk1TnBaMUtUMnlLdHdtcElIdFZ3ZVo0V2RScHFRU0hkSDdBJTNEJTNE',
-        'xa_sessid': '15d2a35574f520f5489f60fdd76a2cff',
-        'xa_valid': 'cc47247239c6c1222afd2fef705d3406e7452792e49e1c7792e1dcb3d4b2f635',
-        '_ga_43ZTZFMP3D': 'GS1.1.1694962363.1.0.1694962364.0.0.0',
-        'twk_uuid_61820a016885f60a50ba1014': '%7B%22uuid%22%3A%221.7xY5XEjYvB4YiSDOJzdMyXnYLWvtIdThVsSnQjzna5qPTvqQX4KGw84L4SM5IIaubxchTG8aTqbxdOZbG1eDXAXTk5QPxSB3WjlqyU7cc6TCRIqNhKbwZA71%22%2C%22version%22%3A3%2C%22domain%22%3A%22cryptometer.io%22%2C%22ts%22%3A1694962365759%7D',
-        '_gid': 'GA1.2.1076995558.1694962368',
-        'PHPSESSID': '0526a0c521dbae272e625c78ef13912e',
-        '_ga': 'GA1.1.865946597.1671607478',
-        '_ga_9ZT12HEGGM': 'GS1.1.1695036724.5.1.1695036729.55.0.0',
+        'PHPSESSID': 'c0ecf1f3fdfd8ddc1804ef55ac86d197',
+        '_ga_9ZT12HEGGM': 'GS1.1.1703592373.3.1.1703593518.60.0.0',
     }
 
     headers = {
-        'accept': 'application/json',
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36',
+        'authority': 'www.cryptometer.io',
+        'accept': 'application/json, text/javascript, */*; q=0.01',
+        'accept-language': 'en-GB,en;q=0.9,en-US;q=0.8,fa;q=0.7',
+        # 'cookie': '_ga=GA1.1.928168899.1703515594; cookieControl=true; cookieControlPrefs=%5B%22preferences%22%2C%22analytics%22%2C%22marketing%22%5D; PHPSESSID=c0ecf1f3fdfd8ddc1804ef55ac86d197; _ga_9ZT12HEGGM=GS1.1.1703592373.3.1.1703593518.60.0.0',
+        'referer': 'https://www.cryptometer.io/volume-flow?v=table-view',
+        'sec-ch-ua': '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"Windows"',
+        'sec-fetch-dest': 'empty',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-site': 'same-origin',
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'x-requested-with': 'XMLHttpRequest',
     }
 
     params = {
         'req': 'volume_flow_table_view',
-        'token': '4c150ea2726502ced17b846158309423cc48e3b9b7510ffc8296edfbabcb3928',
+        'token': '71b3486fa12b406c600aa1423b3d49949c859a5b42b9eaeeddfd80493c82c4d0',
         'filter': 'all',
         'timeframe': 'd',
-        '_': '1694962103356',
+        '_': '1703593518938',
     }
 
     response = requests.get('https://www.cryptometer.io/ajaxToken.php', params=params, cookies=cookies, headers=headers)
@@ -38,9 +43,21 @@ def get_crypto_meter_dataframe():
     df['inflow_raw'] = df['inflow_raw'].astype(float)
     df['mcap_raw'] = df['mcap_raw'].astype(float)
     df = df[df['mcap_raw'] > 0]
-    df['volume_mcap'] = df['inflow_raw'] / df['mcap_raw']
-    df = df.sort_values('volume_mcap',ascending=False)
+    # df['volume_mcap'] = df['inflow_raw'] / df['mcap_raw']
+    df['outflow_mcap'] = df['outflow_raw'] / df['mcap_raw']
+    df['inflow_mcap'] = df['inflow_raw'] / df['mcap_raw']
+    # df = df.sort_values('volume_mcap',ascending=False)
+    df = df.sort_values('outflow_mcap',ascending=False)
     df['name'] = df['name'].apply(lambda x: str(x) + '-USDT')
 
     return df
 
+if (__name__ == '__main__'):
+    df = get_crypto_meter_dataframe()
+    df_coin_market_cap = get_coin_market_cap_df()
+    df_coin_market_cap_500 = df_coin_market_cap[df_coin_market_cap['cmc_rank'] < 501]
+    df_joined = pd.merge(df,df_coin_market_cap_500,'inner',left_on='name',right_on='symbol')
+    df_joined['outflow_vol'] = df_joined['outflow_raw'] / df_joined['quote.USD.volume_24h']
+    df_joined['inflow_vol'] = df_joined['inflow_raw'] / df_joined['quote.USD.volume_24h']
+    with pd.ExcelWriter('crypto_meter.xlsx') as writer:
+        df_joined.to_excel(writer)
